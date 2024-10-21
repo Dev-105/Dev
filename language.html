@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="dev.png">
+    <title>LANGUAGE & NOTE</title>
+    <style>
+     hidden{  
+    display:none;
+}   
+.menu{
+    width: 200px;
+    height: 70px;
+    background: black;
+    position: absolute;
+    top:0;
+    box-shadow: 0 0 10px 0.1px white;
+    right:0;
+    border: 2px solid white;
+    border-radius: 0 0 0 10px ; 
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    align-content: center;  
+    animation : show 0.4s ease-in 0.1s both ;
+    z-index: 4;
+}
+.b:hover{
+    color: black;
+    background: white;
+    transform: scale(1.3)  ;
+    padding: 5px;
+    transition: transform 1s ;
+}
+        #bar{
+    width: 40px;height: 40px;background: black;border-radius: 5px;
+    position: fixed;
+    top:0;
+    right:2px;
+    display:flex;
+    flex-flow: column wrap;
+    justify-content:space-around;
+    align-content:center;
+    transform:scale(0.7);
+    z-index:5;
+    border: 2px solid white;
+}
+.column{
+    width: 90%;
+    height: 5px;
+    background: white;
+}
+       .div{
+        position: absolute ;
+            top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: black;
+    width: 300px;
+    height: 500px;
+    border-radius: 10px;
+    display: flex;
+    border: 2px solid white;
+    flex-flow: column wrap;
+    justify-content: space-evenly;
+    align-itmes: center;
+    
+        }
+        body{
+            background: black;
+        }
+        p{
+    display: block;
+    text-decoration: none;
+    color : white ;
+    text-transform: uppercase;
+    border-radius: 10px;
+    
+}
+        .a{
+            text-decoration:none;
+            font: 800 19px normal ;
+            padding: 5px ;
+            margin: 10px auto;
+            color : white;
+            background: black;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 10px 1px 10px white ;
+            
+        }
+        .a:hover{
+            background:white;
+            border: 2px solid black;
+            color: black;
+           animation : vip 0.5s infinite;
+        }
+        .wts{
+            position: absolute;
+            bottom: 20px; 
+            left: 50%;
+    transform: translate(-50%,0);text-decoration:none;
+            font: 800 19px normal ;
+            padding: 5px ;
+            margin: 10px auto;
+            color : white;
+            background: black;
+            border-radius: 10px;
+            border: 2px solid white;
+            
+    
+        }
+        wts:hover{
+            background:white;
+            border: 2px solid black;
+            color: black;
+        }
+        @keyframes vip{
+    0% {transform: translate(0,0); }
+    10% {transform: translate(2px,2px); }
+    20% {transform: translate(0,2px); }
+    30% {transform: translate(-2px,0); }
+    40% {transform: translate(2px,-2px); }
+    50% {transform: translate(0,0); }
+    60% {transform: translate(-2px,2px); }
+    70% {transform: translate(2px,0); }
+    80% {transform: translate(2px,-2px); }
+    90% {transform: translate(0,-2px); }
+    100% {transform: translate(0,0); }
+    
+}
+    
+@keyframes hid{
+     0% { opacity: 0.5;}
+    20% { opacity: 0.4;}
+    40% { opacity: 0.3;}
+    60% { opacity: 0.2;}
+   100% { opacity: 0; display:none;}
+}
+    </style>
+</head>
+<body>
+    <div id="bar">
+       <div class="column"></div>
+       <div class="column"></div>
+       <div class="column"></div>
+   </div>
+   <div  class="menu hidden">
+       <p class="b">My Note</p>
+       </div>
+    <div class="div">
+        <a class="a" href="https://youtube.com/playlist?list=PLpQgsScLDotSTMmPfy7X9skFv2feufsjY&si=iPejFXafLBuCRB6q">Base De Donner</a>
+        <a class="a" href="https://youtu.be/Oeyxglfit5U?si=qDg2y6x9A-G1XshD">Java Script</a>
+        <a class="a" href="https://youtube.com/playlist?list=PLZpzLuUp9qXwrApSukhtvpi4U6l-INcTI&si=m-KTjBAXWLQOeazC">Algorithm</a>
+        <a class="a" href="https://youtube.com/playlist?list=PLoP3S2S1qTfCUdNazAZY1LFALcUr0Vbs9&si=9lVJ4e68BVNWjD3f">Python</a>
+        <a class="a" href="https://youtu.be/q3yFo-t1ykw?si=OeHq5dUOuptbqUCL">HTML</a>
+        <a class="a" href="https://youtu.be/Z-5QVutAEW4?si=B6JKBaEb1VTnDpy3">CSS</a>
+        
+    </div>
+    <a href="https://wa.me/212633549914" class="wts">WhatsApp</a>
+    <script>
+let note = document.querySelector('.b');
+let bar = document.querySelector('#bar');
+ note.onclick = function () {
+     setTimeout( function () {
+     location.href='note.html'
+ }, 1000)
+ }
+
+    </script>
+</body>
+</html>

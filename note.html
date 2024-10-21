@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="dev.png">
+    <title>NOTE</title>
+    <style>
+        body{
+    background: black;
+}
+#note{
+    width: 80%;
+    color: white;
+    background:black;
+    border: 2px solid white ;
+    margin:0 auto;
+    box-shadow: 0 0 10px 1px white;
+    border-radius: 10px;
+    text-align: center;
+    height: 60vh;
+}
+h1{
+    text-shadow: 0 0 10px white;
+}
+#information{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+h4, input{
+    margin: 10px 15px;
+}
+h4{
+    text-transform: uppercase;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    padding: 5px ;
+    border-radius: 10px;
+    text-shadow: 0 0 10px white;
+}
+
+#information input{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid white;
+}
+p{
+
+    text-transform: uppercase;
+    border-top: 2px solid white;
+    width: 80%;
+    padding-top: 5px ;
+    margin: 10px auto;
+    text-shadow: 0 0 10px white;
+    
+}
+#data{
+  
+}
+#alldiv{
+    color: white;
+    background:black;
+    border: 2px solid white ;
+    margin:0 auto;
+    box-shadow: 0 0 10px 1px white;
+    border-radius: 10px;
+    width: 90%;
+    height: 50vh;
+    position: relative;
+    display: none;
+}
+
+textarea{
+    color: white;
+    outline:none;
+    border: none;
+    position: relative ;
+    left: 0;
+    background: black;
+    height: 80%;
+    margin-top: 10px;
+    font-weight: 800;
+    text-shadow: 0 0 10px white;
+    width: 90%;
+}
+
+button{
+    text-transform: uppercase;
+    border: 2px solid white;
+    padding: 5px ;
+    border-radius: 10px;
+    text-shadow: 0 0 10px white;
+    display: block;
+    position: absolute;
+    background: black;
+    right: 10px ;
+    bottom: 10px;
+    color: white;
+}
+    </style>
+</head>
+<body align="center">
+    <!-- Note -->
+    
+    <div id="note">
+    <!-- head -->
+    
+    <h1>NOTE</h1>
+    <!-- information -->
+    
+    <div id="information">
+    <input id="color" type="color" value="#ffffff"> <h4>ayoub</h4>
+    </div>
+    <!-- data -->
+    <div id="data">
+    <p><span ondblclick="dbl()" >firse note ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>‌<small id="time"> </small> +</p>
+
+    
+    <div>
+        
+        
+        
+    <div id="alldiv">
+        
+         <textarea id="area"></textarea> 
+         <button id="save">Save</button>
+    </div>
+    </div>
+ 
+   
+    
+      
+    
+    <script>
+        let color = document.getElementById('color');
+let text = 'USER';
+document.querySelector('h4').ondblclick= function () {
+    localStorage.name = prompt("What's Your Name");
+    document.querySelector('h4').innerText = localStorage.name;
+ 
+}
+if (localStorage.name) {
+    document.querySelector('h4').innerText = localStorage.name;
+ document.title = localStorage.name;
+} else {
+    text = prompt("What's Your Name");
+    document.querySelector('h4').innerText = text;
+    localStorage.name = text;
+}
+if (localStorage.ntname){
+    document.querySelector('span').innerText = `${localStorage.ntname} ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ `;
+}
+
+
+if (localStorage.time){
+    document.querySelector('#time').innerText = localStorage.time;
+}
+color.addEventListener('change', function () {
+    var c = color.value;
+    document.querySelector('body').style.background = c;
+    document.querySelector('#alldiv').style.background = c;
+    document.querySelector('#area').style.background = c;
+    document.querySelector('#save').style.background = c;
+    document.querySelector('#note').style.background = c;
+    document.querySelector('h4').style.background = c;
+    document.querySelector('#color').style.border = c;
+});
+
+
+let allnote;
+if (localStorage.menu ){
+   allnote =localStorage.menu;
+ 
+  document.querySelector('#area').value= allnote  ; 
+ }
+
+else{
+allnote=' ';
+}
+let p =document.querySelector('p');
+p.onclick= function () {
+ document.querySelector('#alldiv').style.display='block';  
+  
+  allnote = document.querySelector('#area').value;
+    
+   
+    localStorage.menu = allnote;
+    
+}
+
+
+
+
+
+let save = document.querySelector('#save')
+save.onclick = function notes() {
+         
+  allnote= document.querySelector('#area').value;
+  
+    
+    localStorage.menu = allnote;
+ document.querySelector('#alldiv').style.display='none';
+ nnow();
+}
+
+function nnow() {
+    
+
+let time =document.querySelector('#time');
+let now = new Date();
+let h = now.getHours();
+let m = now.getMinutes();
+if (m<10){
+    m = `0${m}`;
+ 
+}
+if (h<10){
+   
+    h = `0${h}`;
+}
+let nd = `${h}:${m}`;
+ document.querySelector('#time').innerText = nd;
+ localStorage.time = nd;
+}
+
+function dbl() {
+
+   let notename = prompt('Name of Your Note');
+ document.querySelector('span').innerText = `${notename} ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ `;  
+ localStorage.ntname = notename;
+}
+
+
+let clik = 0;
+document.addEventListener('dblclick', function () {
+    clik++;
+    if(clik===3)
+{
+    location.href='https://wa.me/212633549914';
+}})
+
+    </script>
+</body>
+</html>

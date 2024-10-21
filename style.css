@@ -1,0 +1,191 @@
+body{
+    background: black;
+    
+}
+#bar{
+    width: 40px;height: 40px;background: black;border-radius: 5px;
+    position: fixed;
+    top:0;
+    right:2px;
+    display:flex;
+    flex-flow: column wrap;
+    justify-content:space-around;
+    align-content:center;
+    transform:scale(0.7);
+    z-index:5;
+    border: 2px solid white;
+}
+.column{
+    width: 90%;
+    height: 5px;
+    background: white;
+}
+.menu{
+    width: 150px;
+    height: 900px;
+    background: black;
+    position: absolute;
+    top:0;
+    box-shadow: 0 0 10px 0.1px white;
+    right:0;
+    border: 2px solid white;
+    border-radius: 0 0 0 10px ; 
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    align-content: center;  
+    animation : show 0.4s ease-in 0.1s both ;
+    z-index: 4;
+}
+.hidden{  
+    animation : hid 0.3s ease-in 0.1s both;
+}
+@keyframes hid{
+     0% { opacity: 0.5;}
+    20% { opacity: 0.4;}
+    40% { opacity: 0.3;}
+    60% { opacity: 0.2;}
+   100% { opacity: 0; display:none;}
+}
+@keyframes show{
+     0% { opacity: 0;}
+    20% { opacity: 0.2;}
+    40% { opacity: 0.4;}
+    60% { opacity: 0.6;}
+    80% { opacity: 0.8;}
+   100% { opacity: 1;}
+}
+p{
+    display: block;
+    text-decoration: none;
+    color : white ;
+    text-transform: uppercase;
+    border-radius: 10px;
+    
+}
+.a{
+    margin-top: 50px;
+}
+
+p:hover{
+    color: black;
+    background: white;
+    transform: scale(1.4)  ;
+    padding: 5px;
+    transition: transform 1s ;
+}
+.page{
+    width: 200px;
+    height: 300px;
+    background: black;
+    border: 2px solid white;
+    box-shadow: 0 0 10px 1px white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border-radius: 10px;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: flex-start ;
+    align-content: canter;
+    
+    
+}
+input{
+    margin: 10px auto;
+    width: 80%;
+    height: 10%;
+    border: 2px solid white;
+    background: black;
+    color: white;
+    font-size: 18px;
+    padding-left: 5px ;
+    border-radius: 10px;
+    outline:none;
+    box-shadow: 0 0 5px 0.3px white;
+    animation : vip 1s linear infinite ;
+}
+input:focus{
+    animation : vip 1s linear infinite paused;
+}
+h1{
+    color:white;
+    animation : vip 1s linear infinite ;
+    text-shadow: 0 0 5px white;
+}
+a{
+    width: 60%;
+    height: 10%;
+    margin: 20px auto;
+    background: black ;
+    color: white;
+    border: 2px white solid;
+    border-radius: 10px;
+    box-shadow: 0 0 5px 0.3px white;
+    text-decoration:none;
+    animation : vip 1s linear infinite ;
+    padding-top:5px;
+}
+@keyframes translate{
+    0%{ 
+        top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    }
+    100%{ 
+        top: 20%;
+    left: 50%;
+    transform: translate(-50%,-20%);
+    }
+}
+@keyframes vip{
+    0% {transform: translate(0,0); }
+    10% {transform: translate(1px,1px); }
+    20% {transform: translate(0,1px); }
+    30% {transform: translate(-1px,0); }
+    40% {transform: translate(1px,-1px); }
+    50% {transform: translate(0,0); }
+    60% {transform: translate(-1px,1px); }
+    70% {transform: translate(1px,0); }
+    80% {transform: translate(1px,-1px); }
+    90% {transform: translate(0,-1px); }
+    100% {transform: translate(0,0); }
+    
+}
+h2 , h3{
+    color:white;
+    display:block;
+    
+}
+main{
+    width: 250px;
+    height: 150px;
+    border: 2px solid white;
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: black;
+}
+h2{
+    position: absolute ;
+    top:-40px;
+    right:-12px;
+   
+    background: black;
+    padding: 5px;
+    
+    
+}
+h3{
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%,-20%);
+}
+input::placeholder{
+    color: white;
+    font-size: 0.7rem;
+    
+}

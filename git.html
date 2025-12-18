@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Cheat Sheet - Guide Complet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f8fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            font-size: 11px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f05133;
+        }
+
+        h1 {
+            color: #f05133;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .git-logo {
+            font-size: 2rem;
+            color: #f05133;
+            margin-bottom: 15px;
+        }
+
+        .search-container {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #f05133;
+            box-shadow: 0 4px 12px rgba(240, 81, 51, 0.2);
+        }
+
+        .instructions {
+            background-color: #e9f7fe;
+            border-left: 4px solid #2d9cdb;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #2d9cdb;
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background-color: #f05133;
+            color: white;
+        }
+
+        th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .category {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .command {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #f05133;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .description {
+            color: #555;
+        }
+
+        .example {
+            font-family: 'Courier New', monospace;
+            background-color: #f0f7ff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #2d9cdb;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .init { background-color: #e1f5fe; color: #0277bd; }
+.config { background-color: #f3e5f5; color: #7b1fa2; }
+.branch { background-color: #e8f5e9; color: #2e7d32; }
+.status { background-color: #fff3e0; color: #f57c00; }
+.stage { background-color: #e8eaf6; color: #3949ab; }
+.commit { background-color: #e0f2f1; color: #00695c; }
+.log { background-color: #f3e5f5; color: #6a1b9a; }
+.diff { background-color: #f1f8e9; color: #558b2f; }
+.merge { background-color: #fff3e0; color: #ef6c00; }
+.rebase { background-color: #fce4ec; color: #c2185b; }
+.cherry-pick { background-color: #fff8e1; color: #ff8f00; }
+.remote { background-color: #e0f2f1; color: #00695c; }
+.undo { background-color: #ffebee; color: #c62828; }
+.stash { background-color: #f3e5f5; color: #6a1b9a; }
+.tag { background-color: #fff8e1; color: #ff8f00; }
+.gitlab { background-color: #e3f2fd; color: #1565c0; }
+.github { background-color: #f5f5f5; color: #24292e; }
+.bisect { background-color: #fff3e0; color: #ff8f00; }
+.worktree { background-color: #e8f5e9; color: #2e7d32; }
+.submodule { background-color: #e0f2f1; color: #00838f; }
+.patch { background-color: #f3e5f5; color: #7b1fa2; }
+.debug { background-color: #ffebee; color: #c62828; }
+.git-flow { background-color: #e1f5fe; color: #0277bd; }
+.performance { background-color: #f5f5f5; color: #424242; }
+.help { background-color: #e8eaf6; color: #3949ab; }
+
+/* Classes pour les nouvelles catégories que vous avez ajoutées */
+.branch { background-color: #e8f5e9; color: #2e7d32; }
+.stage { background-color: #e8eaf6; color: #3949ab; }
+.commit { background-color: #e0f2f1; color: #00695c; }
+.diff { background-color: #f1f8e9; color: #558b2f; }
+.cherry-pick { background-color: #fff8e1; color: #ff8f00; }
+.bisect { background-color: #fff3e0; color: #ff8f00; }
+.worktree { background-color: #e8f5e9; color: #2e7d32; }
+.submodule { background-color: #e0f2f1; color: #00838f; }
+.patch { background-color: #f3e5f5; color: #7b1fa2; }
+.debug { background-color: #ffebee; color: #c62828; }
+.git-flow { background-color: #e1f5fe; color: #0277bd; }
+.performance { background-color: #f5f5f5; color: #424242; }
+.help { background-color: #e8eaf6; color: #3949ab; }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .match {
+            background-color: #fff9c4;
+            font-weight: bold;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            th, td {
+                padding: 12px 10px;
+            }
+            
+            .search-box {
+                padding: 12px 15px;
+            }
+        }
+
+        @media print {
+            .search-container, .instructions {
+                display: none;
+            }
+            
+            body {
+                background-color: white;
+            }
+            
+            .table-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="git-logo">
+            <i class="fab fa-git-alt"></i>
+        </div>
+        <h1>Git Cheat Sheet</h1>
+        <p class="subtitle">Guide complet des commandes Git pour l'examen OFPPT</p>
+    </header>
+
+    <div class="instructions">
+        <h3><i class="fas fa-lightbulb"></i> Comment utiliser cette cheat sheet</h3>
+        <p>Utilisez la barre de recherche pour filtrer les commandes par nom, catégorie ou description. Cliquez sur les exemples pour les copier. Cette liste couvre toutes les commandes essentielles de Git, de l'initialisation à la gestion des branches et merge requests.</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="Rechercher une commande, une catégorie ou une description... (ex: 'branch', 'reset', 'git log')">
+    </div>
+
+    <div class="table-container">
+        <table id="gitCommandsTable">
+            <thead>
+                <tr>
+                    <th width="15%">Catégorie</th>
+                    <th width="20%">Commande Git</th>
+                    <th width="35%">Description</th>
+                    <th width="30%">Exemple d'utilisation</th>
+                </tr>
+            </thead>
+            <tbody id="commandsBody">
+                <!-- Les lignes du tableau seront générées par JavaScript -->
+            </tbody>
+        </table>
+        <div id="noResultsMessage" class="no-results" style="display: none;">
+            <p><i class="fas fa-search"></i> Aucune commande ne correspond à votre recherche.</p>
+            <p>Essayez avec d'autres termes comme "branch", "reset" ou "merge".</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Git Cheat Sheet - Révision pour l'examen OFPPT</p>
+        <p><i class="far fa-copyright"></i> 2025 - Guide complet des commandes Git</p>
+    </footer>
+
+    <script>
+        // Données des commandes Git
+const gitCommands = [
+    // ... (votre contenu existant) ...
+    
+    {
+        category: "Init",
+        command: "git init --bare",
+        description: "Initialise un dépôt bare (sans répertoire de travail)",
+        example: "git init --bare myproject.git"
+    },
+    {
+        category: "Config",
+        command: "git config --global alias",
+        description: "Crée un alias pour une commande Git",
+        example: "git config --global alias.co checkout"
+    },
+    {
+        category: "Config",
+        command: "git config --global core.editor",
+        description: "Définit l'éditeur par défaut pour Git",
+        example: "git config --global core.editor \"code --wait\""
+    },
+    {
+        category: "Branch",
+        command: "git branch -m [ancien] [nouveau]",
+        description: "Renomme une branche locale",
+        example: "git branch -m old-branch new-branch"
+    },
+    {
+        category: "Branch",
+        command: "git branch -r",
+        description: "Liste toutes les branches distantes",
+        example: "git branch -r"
+    },
+    {
+        category: "Branch",
+        command: "git branch -a",
+        description: "Liste toutes les branches (locales et distantes)",
+        example: "git branch -a"
+    },
+    {
+        category: "Branch",
+        command: "git branch --set-upstream-to",
+        description: "Définit la branche distante associée à une branche locale",
+        example: "git branch --set-upstream-to=origin/main"
+    },
+    {
+        category: "Branch",
+        command: "git checkout --",
+        description: "Annule les modifications d'un fichier",
+        example: "git checkout -- fichier.txt"
+    },
+    {
+        category: "Stage",
+        command: "git add -p",
+        description: "Ajoute interactivement des parties de fichiers (patch)",
+        example: "git add -p"
+    },
+    {
+        category: "Stage",
+        command: "git add -u",
+        description: "Ajoute tous les fichiers suivis modifiés",
+        example: "git add -u"
+    },
+    {
+        category: "Stage",
+        command: "git restore",
+        description: "Restaure les fichiers (Git 2.23+)",
+        example: "git restore fichier.txt"
+    },
+    {
+        category: "Stage",
+        command: "git restore --staged",
+        description: "Enlève un fichier de l'index (unstaging)",
+        example: "git restore --staged fichier.txt"
+    },
+    {
+        category: "Commit",
+        command: "git commit --allow-empty",
+        description: "Crée un commit vide (sans modifications)",
+        example: "git commit --allow-empty -m \"Commit vide\""
+    },
+    {
+        category: "Commit",
+        command: "git commit --date",
+        description: "Crée un commit avec une date spécifique",
+        example: "git commit --date=\"2024-01-01\" -m \"Commit rétrodaté\""
+    },
+    {
+        category: "Log",
+        command: "git log --stat",
+        description: "Affiche les stats des fichiers modifiés dans les commits",
+        example: "git log --stat"
+    },
+    {
+        category: "Log",
+        command: "git log --since",
+        description: "Affiche les commits depuis une date spécifique",
+        example: "git log --since=\"2024-01-01\""
+    },
+    {
+        category: "Log",
+        command: "git log --author",
+        description: "Filtre les commits par auteur",
+        example: "git log --author=\"John\""
+    },
+    {
+        category: "Log",
+        command: "git log -p",
+        description: "Affiche les diff des commits",
+        example: "git log -p"
+    },
+    {
+        category: "Log",
+        command: "git log --grep",
+        description: "Recherche dans les messages de commit",
+        example: "git log --grep=\"bug\""
+    },
+    {
+        category: "Diff",
+        command: "git diff HEAD",
+        description: "Diff entre répertoire de travail et dernier commit",
+        example: "git diff HEAD"
+    },
+    {
+        category: "Diff",
+        command: "git diff [branch1] [branch2]",
+        description: "Diff entre deux branches",
+        example: "git diff main feature"
+    },
+    {
+        category: "Diff",
+        command: "git diff --name-only",
+        description: "Affiche seulement les noms des fichiers différents",
+        example: "git diff --name-only"
+    },
+    {
+        category: "Merge",
+        command: "git merge --squash",
+        description: "Fusionne en écrasant tous les commits en un seul",
+        example: "git merge --squash feature"
+    },
+    {
+        category: "Rebase",
+        command: "git rebase --continue",
+        description: "Continue un rebase après résolution des conflits",
+        example: "git rebase --continue"
+    },
+    {
+        category: "Rebase",
+        command: "git rebase --skip",
+        description: "Saute un commit pendant un rebase interactif",
+        example: "git rebase --skip"
+    },
+    {
+        category: "Remote",
+        command: "git remote show",
+        description: "Affiche les détails d'un dépôt distant",
+        example: "git remote show origin"
+    },
+    {
+        category: "Remote",
+        command: "git remote rename",
+        description: "Renomme un dépôt distant",
+        example: "git remote rename origin upstream"
+    },
+    {
+        category: "Remote",
+        command: "git pull --rebase",
+        description: "Pull avec rebase au lieu de merge",
+        example: "git pull --rebase origin main"
+    },
+    {
+        category: "Remote",
+        command: "git push --force-with-lease",
+        description: "Force push plus sécurisé (vérifie les changements distants)",
+        example: "git push --force-with-lease origin main"
+    },
+    {
+        category: "Remote",
+        command: "git push --delete",
+        description: "Supprime une branche distante",
+        example: "git push origin --delete old-branch"
+    },
+    {
+        category: "Undo",
+        command: "git clean",
+        description: "Supprime les fichiers non suivis",
+        example: "git clean -n" // dry-run
+    },
+    {
+        category: "Undo",
+        command: "git clean -f",
+        description: "Force la suppression des fichiers non suivis",
+        example: "git clean -f"
+    },
+    {
+        category: "Undo",
+        command: "git clean -fd",
+        description: "Supprime fichiers et répertoires non suivis",
+        example: "git clean -fd"
+    },
+    {
+        category: "Stash",
+        command: "git stash save",
+        description: "Sauvegarde avec un message personnalisé",
+        example: "git stash save \"Travail en cours sur le login\""
+    },
+    {
+        category: "Stash",
+        command: "git stash branch",
+        description: "Crée une branche à partir d'un stash",
+        example: "git stash branch new-branch stash@{0}"
+    },
+    {
+        category: "Stash",
+        command: "git stash clear",
+        description: "Supprime tous les stashs",
+        example: "git stash clear"
+    },
+    {
+        category: "Tag",
+        command: "git tag -d",
+        description: "Supprime un tag local",
+        example: "git tag -d v1.0.0"
+    },
+    {
+        category: "Tag",
+        command: "git push origin --delete",
+        description: "Supprime un tag distant",
+        example: "git push origin --delete v1.0.0"
+    },
+    {
+        category: "Bisect",
+        command: "git bisect start",
+        description: "Démarre une recherche binaire pour trouver un bug",
+        example: "git bisect start"
+    },
+    {
+        category: "Bisect",
+        command: "git bisect good",
+        description: "Marque un commit comme bon",
+        example: "git bisect good abc123"
+    },
+    {
+        category: "Bisect",
+        command: "git bisect bad",
+        description: "Marque un commit comme mauvais",
+        example: "git bisect bad"
+    },
+    {
+        category: "Bisect",
+        command: "git bisect reset",
+        description: "Termine la session bisect",
+        example: "git bisect reset"
+    },
+    {
+        category: "Cherry-pick",
+        command: "git cherry-pick --no-commit",
+        description: "Applique les changements sans créer de commit",
+        example: "git cherry-pick --no-commit abc123"
+    },
+    {
+        category: "Cherry-pick",
+        command: "git cherry-pick -n",
+        description: "Même que --no-commit",
+        example: "git cherry-pick -n abc123"
+    },
+    {
+        category: "Worktree",
+        command: "git worktree add",
+        description: "Ajoute un répertoire de travail supplémentaire",
+        example: "git worktree add ../feature-branch feature"
+    },
+    {
+        category: "Worktree",
+        command: "git worktree list",
+        description: "Liste tous les répertoires de travail",
+        example: "git worktree list"
+    },
+    {
+        category: "Submodule",
+        command: "git submodule add",
+        description: "Ajoute un sous-module",
+        example: "git submodule add https://github.com/user/lib.git"
+    },
+    {
+        category: "Submodule",
+        command: "git submodule update --init",
+        description: "Initialise et met à jour les sous-modules",
+        example: "git submodule update --init"
+    },
+    {
+        category: "Patch",
+        command: "git format-patch",
+        description: "Crée des fichiers patch à partir de commits",
+        example: "git format-patch HEAD~3"
+    },
+    {
+        category: "Patch",
+        command: "git apply",
+        description: "Applique un patch",
+        example: "git apply mon-patch.patch"
+    },
+    {
+        category: "Debug",
+        command: "git blame",
+        description: "Affiche qui a modifié chaque ligne d'un fichier",
+        example: "git blame fichier.txt"
+    },
+    {
+        category: "Debug",
+        command: "git show",
+        description: "Affiche les détails d'un commit, tag ou arbre",
+        example: "git show abc123"
+    },
+    {
+        category: "Debug",
+        command: "git reflog",
+        description: "Affiche l'historique des références (pour récupérer des commits perdus)",
+        example: "git reflog"
+    },
+    {
+        category: "Debug",
+        command: "git fsck",
+        description: "Vérifie l'intégrité de la base de données Git",
+        example: "git fsck"
+    },
+    {
+        category: "GitLab/GitHub",
+        command: "git push -o merge_request.merge_when_pipeline_succeeds",
+        description: "Merge automatiquement la MR quand le pipeline réussit (GitLab)",
+        example: "git push -o merge_request.merge_when_pipeline_succeeds"
+    },
+    {
+        category: "GitLab/GitHub",
+        command: "git push -o merge_request.description",
+        description: "Définit la description de la MR (GitLab)",
+        example: "git push -o merge_request.description=\"Description de la MR\""
+    },
+    {
+        category: "GitHub",
+        command: "git pull upstream main",
+        description: "Pattern commun pour synchroniser un fork GitHub",
+        example: "git pull upstream main"
+    },
+    {
+        category: "GitHub",
+        command: "git push origin HEAD",
+        description: "Push la branche courante (utile pour les PR)",
+        example: "git push origin HEAD"
+    },
+    {
+        category: "Git Flow",
+        command: "git flow init",
+        description: "Initialise Git Flow dans le dépôt",
+        example: "git flow init -d"
+    },
+    {
+        category: "Git Flow",
+        command: "git flow feature start",
+        description: "Démarre une nouvelle fonctionnalité",
+        example: "git flow feature start login"
+    },
+    {
+        category: "Git Flow",
+        command: "git flow feature finish",
+        description: "Termine une fonctionnalité",
+        example: "git flow feature finish login"
+    },
+    {
+        category: "Performance",
+        command: "git gc",
+        description: "Nettoyage et optimisation du dépôt",
+        example: "git gc"
+    },
+    {
+        category: "Performance",
+        command: "git prune",
+        description: "Supprime les objets non atteignables",
+        example: "git prune"
+    },
+    {
+        category: "Help",
+        command: "git help",
+        description: "Affiche l'aide générale",
+        example: "git help"
+    },
+    {
+        category: "Help",
+        command: "git [commande] --help",
+        description: "Affiche l'aide pour une commande spécifique",
+        example: "git commit --help"
+    }
+];
+        // Fonction pour générer le tableau
+        function generateTable() {
+            const commandsBody = document.getElementById('commandsBody');
+            commandsBody.innerHTML = '';
+            
+            gitCommands.forEach(command => {
+                const row = document.createElement('tr');
+                
+                // Création des cellules
+                const categoryCell = document.createElement('td');
+                categoryCell.innerHTML = `<span class="category-badge ${command.category.toLowerCase()}">${command.category}</span>`;
+                
+                const commandCell = document.createElement('td');
+                commandCell.innerHTML = `<div class="command">${command.command}</div>`;
+                
+                const descriptionCell = document.createElement('td');
+                descriptionCell.innerHTML = `<div class="description">${command.description}</div>`;
+                
+                const exampleCell = document.createElement('td');
+                exampleCell.innerHTML = `<div class="example">${command.example}</div>`;
+                
+                // Ajout des cellules à la ligne
+                row.appendChild(categoryCell);
+                row.appendChild(commandCell);
+                row.appendChild(descriptionCell);
+                row.appendChild(exampleCell);
+                
+                // Ajout de la ligne au tableau
+                commandsBody.appendChild(row);
+                
+                // Ajout d'un événement de clic pour copier l'exemple
+                exampleCell.addEventListener('click', function() {
+                    copyToClipboard(command.example);
+                    showCopyFeedback(this, command.example);
+                });
+            });
+        }
+
+        // Fonction de recherche
+        function filterTable() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#commandsBody tr');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            
+            let visibleRows = 0;
+            
+            rows.forEach(row => {
+                const category = row.cells[0].textContent.toLowerCase();
+                const command = row.cells[1].textContent.toLowerCase();
+                const description = row.cells[2].textContent.toLowerCase();
+                
+                // Vérifier si la ligne correspond au filtre
+                const match = category.includes(filter) || 
+                              command.includes(filter) || 
+                              description.includes(filter);
+                
+                if (match) {
+                    row.style.display = '';
+                    visibleRows++;
+                    
+                    // Mise en évidence des correspondances
+                    highlightMatches(row, filter);
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Afficher/masquer le message "aucun résultat"
+            if (visibleRows === 0 && filter.length > 0) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+        }
+
+        // Fonction pour mettre en évidence les correspondances
+        function highlightMatches(row, filter) {
+            if (!filter) return;
+            
+            // Réinitialiser les surlignages précédents
+            const cells = row.cells;
+            for (let cell of cells) {
+                cell.innerHTML = cell.innerHTML.replace(/<span class="match">|<\/span>/g, '');
+            }
+            
+            // Appliquer le surlignage aux cellules
+            for (let i = 0; i < cells.length - 1; i++) { // Ne pas inclure la dernière cellule (exemple)
+                const cell = cells[i];
+                const originalContent = cell.textContent;
+                const lowerContent = originalContent.toLowerCase();
+                
+                if (lowerContent.includes(filter)) {
+                    const regex = new RegExp(`(${filter})`, 'gi');
+                    cell.innerHTML = originalContent.replace(regex, '<span class="match">$1</span>');
+                }
+            }
+        }
+
+        // Fonction pour copier dans le presse-papier
+        function copyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        // Fonction pour afficher un feedback lors de la copie
+        function showCopyFeedback(element, text) {
+            const originalContent = element.innerHTML;
+            element.innerHTML = `<div class="example" style="background-color: #e8f5e9; color: #2e7d32;"><i class="fas fa-check"></i> Copié: ${text.substring(0, 40)}${text.length > 40 ? '...' : ''}</div>`;
+            
+            setTimeout(() => {
+                element.innerHTML = originalContent;
+            }, 1500);
+        }
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Générer le tableau
+            generateTable();
+            
+            // Ajouter l'événement de recherche
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterTable);
+            
+            // Ajouter l'événement pour effacer la recherche avec la touche Échap
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    filterTable();
+                }
+            });
+            
+            // Message de bienvenue dans la console
+            console.log("Git Cheat Sheet chargée avec succès !");
+            console.log("Utilisez la barre de recherche pour filtrer les commandes.");
+        });
+    </script>
+</body>
+</html>

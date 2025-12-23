@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFIFSA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-procedure: #3b82f6;
+            --color-function: #10b981;
+            --color-variable: #f59e0b;
+            --color-condition: #8b5cf6;
+            --color-loop: #ef4444;
+            --color-cursor: #06b6d4;
+            --color-trigger: #ec4899;
+            --color-signal: #84cc16;
+            --color-comparison: #6366f1;
+            --color-builtin: #f97316;
+        }
+        
+        .code-block {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .sql-keyword {
+            /* color: #d73a49; */
+            color: orange;
+            font-weight: bold;
+        }
+        
+        .sql-string {
+            /* color: #032f62; */
+            color: green;
+        }
+        
+        .sql-comment {
+            color: #6a737d;
+            font-style: italic;
+        }
+        
+        .sql-function {
+            color: #6f42c1;
+        }
+        
+        .sql-number {
+            color: #005cc5;
+        }
+        
+        .sql-builtin {
+            color: #e36209;
+        }
+        
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.3);
+            padding: 2px;
+            border-radius: 3px;
+        }
+        
+        .section-title {
+            border-left-width: 5px;
+            border-left-style: solid;
+            padding-left: 1rem;
+        }
+        
+        .function-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .function-category {
+            border: 2px solid;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .function-example {
+            background-color: #f8f9fa;
+            border-left: 4px solid;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-10">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-database text-blue-600"></i> Advanced SQL Guide
+            </h1>
+            <p class="text-xl text-gray-600 mb-6">
+                A comprehensive visual guide to advanced MySQL concepts with examples
+            </p>
+            
+            <!-- Search Functionality -->
+            <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+                <div class="flex items-center">
+                    <i class="fas fa-search text-gray-400 mr-3 text-xl"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search for any SQL concept (procedures, triggers, cursors, functions, etc.)" 
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                <div class="mt-2 text-sm text-gray-500">
+                    <span id="resultCount">10 concepts available</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- SQL Concepts Sections -->
+        <main id="sectionsContainer">
+            <!-- Built-in Functions -->
+            <section id="builtin-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-builtin" style="border-left-color: var(--color-builtin);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-toolbox mr-2"></i> Built-in SQL Functions
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-orange-100 text-orange-800">
+                        Predefined | Powerful | Essential Operations
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Comprehensive MySQL Function Reference</h3>
+                        <p class="mb-6">MySQL provides hundreds of built-in functions for data manipulation, calculation, and transformation. These functions are optimized for performance and can be used directly in SQL statements.</p>
+                    </div>
+                    
+                    <!-- String Functions -->
+                    <div class="function-category mb-10" style="border-color: #3b82f6;">
+                        <h4 class="text-xl font-bold text-blue-700 mb-4 flex items-center">
+                            <i class="fas fa-font mr-2"></i> String Functions
+                        </h4>
+                        <div class="function-grid">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">CONCAT()</h5>
+                                <p class="text-sm mb-2">Concatenates strings together</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">CONCAT</span>(<span class="sql-string">'Hello'</span>, <span class="sql-string">' '</span>, <span class="sql-string">'World'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ Hello World</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">SUBSTRING()</h5>
+                                <p class="text-sm mb-2">Extracts part of a string</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">SUBSTRING</span>(<span class="sql-string">'MySQL Database'</span>, <span class="sql-number">1</span>, <span class="sql-number">5</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ MySQL</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">UPPER() / LOWER()</h5>
+                                <p class="text-sm mb-2">Changes case of string</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">UPPER</span>(<span class="sql-string">'hello'</span>), <span class="sql-builtin">LOWER</span>(<span class="sql-string">'WORLD'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ HELLO, world</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">LENGTH() / CHAR_LENGTH()</h5>
+                                <p class="text-sm mb-2">Returns string length</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">LENGTH</span>(<span class="sql-string">'MySQL'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 5 (bytes)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">TRIM() / LTRIM() / RTRIM()</h5>
+                                <p class="text-sm mb-2">Removes spaces from string</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">TRIM</span>(<span class="sql-string">'  Hello  '</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ Hello</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-blue-800 mb-2">REPLACE()</h5>
+                                <p class="text-sm mb-2">Replaces substring within string</p>
+                                <div class="function-example" style="border-left-color: #3b82f6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">REPLACE</span>(<span class="sql-string">'Hello World'</span>, <span class="sql-string">'World'</span>, <span class="sql-string">'MySQL'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ Hello MySQL</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Numeric Functions -->
+                    <div class="function-category mb-10" style="border-color: #10b981;">
+                        <h4 class="text-xl font-bold text-green-700 mb-4 flex items-center">
+                            <i class="fas fa-calculator mr-2"></i> Numeric Functions
+                        </h4>
+                        <div class="function-grid">
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">ROUND()</h5>
+                                <p class="text-sm mb-2">Rounds a number to specified decimals</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">ROUND</span>(<span class="sql-number">123.4567</span>, <span class="sql-number">2</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 123.46</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">CEIL() / CEILING()</h5>
+                                <p class="text-sm mb-2">Rounds up to nearest integer</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">CEIL</span>(<span class="sql-number">123.456</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 124</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">FLOOR()</h5>
+                                <p class="text-sm mb-2">Rounds down to nearest integer</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">FLOOR</span>(<span class="sql-number">123.456</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 123</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">ABS()</h5>
+                                <p class="text-sm mb-2">Returns absolute value</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">ABS</span>(<span class="sql-number">-123.45</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 123.45</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">MOD()</h5>
+                                <p class="text-sm mb-2">Returns remainder of division</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">MOD</span>(<span class="sql-number">10</span>, <span class="sql-number">3</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 1</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">POW() / POWER()</h5>
+                                <p class="text-sm mb-2">Raises a number to a power</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">POW</span>(<span class="sql-number">2</span>, <span class="sql-number">3</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 8</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">SQRT()</h5>
+                                <p class="text-sm mb-2">Returns square root</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">SQRT</span>(<span class="sql-number">16</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 4</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-green-800 mb-2">RAND()</h5>
+                                <p class="text-sm mb-2">Returns random number between 0 and 1</p>
+                                <div class="function-example" style="border-left-color: #10b981;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">RAND</span>();
+                                    <div class="text-sm text-gray-600 mt-1">→ Random value like 0.734</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Date & Time Functions -->
+                    <div class="function-category mb-10" style="border-color: #8b5cf6;">
+                        <h4 class="text-xl font-bold text-purple-700 mb-4 flex items-center">
+                            <i class="fas fa-calendar-alt mr-2"></i> Date & Time Functions
+                        </h4>
+                        <div class="function-grid">
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">NOW() / CURDATE() / CURTIME()</h5>
+                                <p class="text-sm mb-2">Current date and time</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">NOW</span>(), <span class="sql-builtin">CURDATE</span>(), <span class="sql-builtin">CURTIME</span>();
+                                    <div class="text-sm text-gray-600 mt-1">→ Current datetime, date, time</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">DATE_ADD() / DATE_SUB()</h5>
+                                <p class="text-sm mb-2">Adds/subtracts time interval</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">DATE_ADD</span>(<span class="sql-builtin">NOW</span>(), <span class="sql-keyword">INTERVAL</span> <span class="sql-number">7</span> <span class="sql-keyword">DAY</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ Date 7 days from now</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">DATEDIFF()</h5>
+                                <p class="text-sm mb-2">Difference between two dates in days</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">DATEDIFF</span>(<span class="sql-string">'2024-12-31'</span>, <span class="sql-string">'2024-01-01'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 365 days</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">TIMESTAMPDIFF()</h5>
+                                <p class="text-sm mb-2">Difference between two timestamps in specified unit</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">TIMESTAMPDIFF</span>(<span class="sql-keyword">YEAR</span>, <span class="sql-string">'2000-01-01'</span>, <span class="sql-builtin">NOW</span>());
+                                    <div class="text-sm text-gray-600 mt-1">→ Years between dates</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">YEAR() / MONTH() / DAY()</h5>
+                                <p class="text-sm mb-2">Extracts date parts</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">YEAR</span>(<span class="sql-builtin">NOW</span>()), <span class="sql-builtin">MONTH</span>(<span class="sql-builtin">NOW</span>()), <span class="sql-builtin">DAY</span>(<span class="sql-builtin">NOW</span>());
+                                    <div class="text-sm text-gray-600 mt-1">→ Current year, month, day</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">DATE_FORMAT()</h5>
+                                <p class="text-sm mb-2">Formats date as specified</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">DATE_FORMAT</span>(<span class="sql-builtin">NOW</span>(), <span class="sql-string">'%W, %M %d, %Y'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ Thursday, January 01, 2024</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">STR_TO_DATE()</h5>
+                                <p class="text-sm mb-2">Converts string to date</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">STR_TO_DATE</span>(<span class="sql-string">'01,5,2023'</span>, <span class="sql-string">'%d,%m,%Y'</span>);
+                                    <div class="text-sm text-gray-600 mt-1">→ 2023-05-01</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-purple-800 mb-2">DAYNAME() / MONTHNAME()</h5>
+                                <p class="text-sm mb-2">Returns name of day/month</p>
+                                <div class="function-example" style="border-left-color: #8b5cf6;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">DAYNAME</span>(<span class="sql-builtin">NOW</span>()), <span class="sql-builtin">MONTHNAME</span>(<span class="sql-builtin">NOW</span>());
+                                    <div class="text-sm text-gray-600 mt-1">→ Monday, January</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aggregate Functions -->
+                    <div class="function-category mb-10" style="border-color: #ec4899;">
+                        <h4 class="text-xl font-bold text-pink-700 mb-4 flex items-center">
+                            <i class="fas fa-chart-bar mr-2"></i> Aggregate Functions
+                        </h4>
+                        <div class="function-grid">
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">COUNT()</h5>
+                                <p class="text-sm mb-2">Counts number of rows</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">COUNT</span>(*) <span class="sql-keyword">FROM</span> users;
+                                    <div class="text-sm text-gray-600 mt-1">→ Total number of users</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">SUM()</h5>
+                                <p class="text-sm mb-2">Calculates sum of values</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">SUM</span>(amount) <span class="sql-keyword">FROM</span> orders;
+                                    <div class="text-sm text-gray-600 mt-1">→ Total amount of all orders</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">AVG()</h5>
+                                <p class="text-sm mb-2">Calculates average of values</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">AVG</span>(price) <span class="sql-keyword">FROM</span> products;
+                                    <div class="text-sm text-gray-600 mt-1">→ Average product price</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">MIN() / MAX()</h5>
+                                <p class="text-sm mb-2">Finds minimum/maximum value</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">MIN</span>(price), <span class="sql-builtin">MAX</span>(price) <span class="sql-keyword">FROM</span> products;
+                                    <div class="text-sm text-gray-600 mt-1">→ Lowest and highest price</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">GROUP_CONCAT()</h5>
+                                <p class="text-sm mb-2">Concatenates values from group</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> category, <span class="sql-builtin">GROUP_CONCAT</span>(product_name) 
+                                    <span class="sql-keyword">FROM</span> products <span class="sql-keyword">GROUP BY</span> category;
+                                    <div class="text-sm text-gray-600 mt-1">→ All products in category as comma-separated list</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-pink-800 mb-2">STDDEV() / VARIANCE()</h5>
+                                <p class="text-sm mb-2">Statistical functions</p>
+                                <div class="function-example" style="border-left-color: #ec4899;">
+                                    <span class="sql-keyword">SELECT</span> <span class="sql-builtin">STDDEV</span>(price) <span class="sql-keyword">FROM</span> products;
+                                    <div class="text-sm text-gray-600 mt-1">→ Standard deviation of prices</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Function Examples -->
+                    <div class="bg-gray-900 text-gray-100 p-6 rounded-lg code-block mb-6">
+                        <h5 class="text-lg font-semibold text-white mb-4">Real-World Function Examples</h5>
+                        <pre><span class="sql-comment">-- Calculate customer age in years</span>
+<span class="sql-keyword">SELECT</span> 
+    name,
+    birth_date,
+    <span class="sql-builtin">TIMESTAMPDIFF</span>(<span class="sql-keyword">YEAR</span>, birth_date, <span class="sql-builtin">CURDATE</span>()) <span class="sql-keyword">AS</span> age_years
+<span class="sql-keyword">FROM</span> customers;
+
+<span class="sql-comment">-- Format order dates nicely</span>
+<span class="sql-keyword">SELECT</span> 
+    order_id,
+    <span class="sql-builtin">DATE_FORMAT</span>(order_date, <span class="sql-string">'%M %d, %Y at %h:%i %p'</span>) <span class="sql-keyword">AS</span> formatted_date,
+    <span class="sql-builtin">ROUND</span>(total_amount, <span class="sql-number">2</span>) <span class="sql-keyword">AS</span> amount
+<span class="sql-keyword">FROM</span> orders;
+
+<span class="sql-comment">-- Calculate days until subscription expires</span>
+<span class="sql-keyword">SELECT</span> 
+    user_id,
+    <span class="sql-builtin">DATEDIFF</span>(expiry_date, <span class="sql-builtin">CURDATE</span>()) <span class="sql-keyword">AS</span> days_remaining,
+    <span class="sql-keyword">CASE</span>
+        <span class="sql-keyword">WHEN</span> <span class="sql-builtin">DATEDIFF</span>(expiry_date, <span class="sql-builtin">CURDATE</span>()) &lt;= <span class="sql-number">7</span> <span class="sql-keyword">THEN</span> <span class="sql-string">'Renew soon'</span>
+        <span class="sql-keyword">WHEN</span> <span class="sql-builtin">DATEDIFF</span>(expiry_date, <span class="sql-builtin">CURDATE</span>()) &lt;= <span class="sql-number">0</span> <span class="sql-keyword">THEN</span> <span class="sql-string">'Expired'</span>
+        <span class="sql-keyword">ELSE</span> <span class="sql-string">'Active'</span>
+    <span class="sql-keyword">END</span> <span class="sql-keyword">AS</span> status
+<span class="sql-keyword">FROM</span> subscriptions;
+
+<span class="sql-comment">-- Generate username from email (extract part before @)</span>
+<span class="sql-keyword">SELECT</span> 
+    email,
+    <span class="sql-builtin">SUBSTRING_INDEX</span>(email, <span class="sql-string">'@'</span>, <span class="sql-number">1</span>) <span class="sql-keyword">AS</span> username,
+    <span class="sql-builtin">UPPER</span>(<span class="sql-builtin">SUBSTRING</span>(email, <span class="sql-number">1</span>, <span class="sql-number">1</span>)) <span class="sql-keyword">AS</span> first_initial
+<span class="sql-keyword">FROM</span> users;
+
+<span class="sql-comment">-- Calculate weighted average with ROUND</span>
+<span class="sql-keyword">SELECT</span> 
+    product_id,
+    <span class="sql-builtin">ROUND</span>(<span class="sql-builtin">SUM</span>(quantity * price) / <span class="sql-builtin">SUM</span>(quantity), <span class="sql-number">2</span>) <span class="sql-keyword">AS</span> avg_price
+<span class="sql-keyword">FROM</span> order_items
+<span class="sql-keyword">GROUP BY</span> product_id;</pre>
+                    </div>
+                    
+                    <div class="bg-orange-50 p-5 rounded-lg">
+                        <h5 class="font-semibold text-orange-800 mb-3">Best Practices for Using Functions</h5>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li><span class="font-semibold">Performance:</span> Functions in WHERE clauses can prevent index usage. Use computed columns instead for frequently filtered data.</li>
+                            <li><span class="font-semibold">Readability:</span> Use aliases (<span class="font-mono">AS</span>) when functions return calculated values.</li>
+                            <li><span class="font-semibold">NULL handling:</span> Most functions return NULL if any argument is NULL. Use <span class="font-mono">IFNULL()</span> or <span class="font-mono">COALESCE()</span> for defaults.</li>
+                            <li><span class="font-semibold">Data types:</span> Be aware of implicit type conversions when mixing data types in functions.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stored Procedures -->
+            <section id="procedure-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-procedure" style="border-left-color: var(--color-procedure);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-cogs mr-2"></i> Stored Procedures
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+                        Modular Code | Reusability | Security
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">What are Stored Procedures?</h3>
+                            <p class="mb-4">A stored procedure is a prepared SQL code that you can save and reuse. It's like a function in other programming languages.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Why Use Procedures?</h4>
+                            <ul class="list-disc pl-5 mb-6 space-y-1">
+                                <li>Reduce network traffic (execute multiple statements at once)</li>
+                                <li>Increase performance (compiled and stored in database)</li>
+                                <li>Enhance security (control data access)</li>
+                                <li>Promote code reusability</li>
+                            </ul>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Parameter Types</h4>
+                            <div class="space-y-2 mb-6">
+                                <div class="flex items-center">
+                                    <span class="w-12 text-center font-bold text-blue-700">IN</span>
+                                    <span>Input parameter (default)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-12 text-center font-bold text-green-700">OUT</span>
+                                    <span>Output parameter</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-12 text-center font-bold text-purple-700">INOUT</span>
+                                    <span>Input and output parameter</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Create a procedure with parameters</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">GetCustomerOrders</span>(
+    <span class="sql-keyword">IN</span> customerId <span class="sql-keyword">INT</span>,
+    <span class="sql-keyword">OUT</span> totalOrders <span class="sql-keyword">INT</span>
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-comment">-- Count orders for a customer</span>
+    <span class="sql-keyword">SELECT COUNT</span>(*) <span class="sql-keyword">INTO</span> totalOrders
+    <span class="sql-keyword">FROM</span> orders
+    <span class="sql-keyword">WHERE</span> customer_id = customerId;
+    
+    <span class="sql-comment">-- Return order details</span>
+    <span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> orders
+    <span class="sql-keyword">WHERE</span> customer_id = customerId
+    <span class="sql-keyword">ORDER BY</span> order_date <span class="sql-keyword">DESC</span>;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- Call the procedure</span>
+<span class="sql-keyword">CALL</span> GetCustomerOrders(<span class="sql-number">123</span>, @total);
+<span class="sql-keyword">SELECT</span> @total <span class="sql-keyword">AS</span> total_orders;</pre>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-blue-800 mb-2">Real-World Usage</h5>
+                                <p class="text-sm">Use procedures for complex business logic like processing orders, generating reports, or data validation that involves multiple SQL statements.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Functions -->
+            <section id="function-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-function" style="border-left-color: var(--color-function);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-function mr-2"></i> User-Defined Functions
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-green-100 text-green-800">
+                        Return Value | Scalar | Deterministic
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">What are User-Defined Functions?</h3>
+                            <p class="mb-4">A user-defined function is a database object that returns a single value. Unlike procedures, functions can be used directly in SQL statements.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-3">Function vs Procedure</h4>
+                            <div class="overflow-hidden rounded-lg border border-gray-200 mb-6">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700">Aspect</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700">Function</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700">Procedure</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm">Return Value</td>
+                                            <td class="px-4 py-3 text-sm font-medium text-green-700">Must return a value</td>
+                                            <td class="px-4 py-3 text-sm">Can return 0 or more values</td>
+                                        </tr>
+                                        <tr class="bg-gray-50">
+                                            <td class="px-4 py-3 text-sm">SQL Statement Usage</td>
+                                            <td class="px-4 py-3 text-sm">Can be used in SELECT</td>
+                                            <td class="px-4 py-3 text-sm">Called with CALL</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm">Transaction</td>
+                                            <td class="px-4 py-3 text-sm">Cannot contain transactions</td>
+                                            <td class="px-4 py-3 text-sm">Can contain transactions</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Create a function to calculate age</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE FUNCTION</span> <span class="sql-function">CalculateAge</span>(
+    birthDate <span class="sql-keyword">DATE</span>
+) 
+<span class="sql-keyword">RETURNS</span> <span class="sql-keyword">INT</span>
+<span class="sql-keyword">DETERMINISTIC</span>
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">DECLARE</span> age <span class="sql-keyword">INT</span>;
+    
+    <span class="sql-keyword">SET</span> age = <span class="sql-keyword">YEAR</span>(<span class="sql-builtin">CURDATE</span>()) - <span class="sql-keyword">YEAR</span>(birthDate);
+    
+    <span class="sql-comment">-- Adjust if birthday hasn't occurred this year</span>
+    <span class="sql-keyword">IF</span> <span class="sql-builtin">MONTH</span>(<span class="sql-builtin">CURDATE</span>()) &lt; <span class="sql-builtin">MONTH</span>(birthDate) 
+        <span class="sql-keyword">OR</span> (<span class="sql-builtin">MONTH</span>(<span class="sql-builtin">CURDATE</span>()) = <span class="sql-builtin">MONTH</span>(birthDate)
+        <span class="sql-keyword">AND</span> <span class="sql-builtin">DAY</span>(<span class="sql-builtin">CURDATE</span>()) &lt; <span class="sql-builtin">DAY</span>(birthDate))
+    <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SET</span> age = age - <span class="sql-number">1</span>;
+    <span class="sql-keyword">END IF</span>;
+    
+    <span class="sql-keyword">RETURN</span> age;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- Use the function in a SELECT statement</span>
+<span class="sql-keyword">SELECT</span> 
+    name,
+    birth_date,
+    <span class="sql-function">CalculateAge</span>(birth_date) <span class="sql-keyword">AS</span> age
+<span class="sql-keyword">FROM</span> users
+<span class="sql-keyword">WHERE</span> <span class="sql-function">CalculateAge</span>(birth_date) &gt; <span class="sql-number">18</span>;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Variables -->
+            <section id="variable-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-variable" style="border-left-color: var(--color-variable);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-tag mr-2"></i> Variables
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+                        Data Storage | Temporary Values | Scoping
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">Variable Types in MySQL</h3>
+                            <p class="mb-4">Variables store temporary data during the execution of SQL code blocks.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Variable Scope</h4>
+                            <div class="space-y-4 mb-6">
+                                <div class="border-l-4 border-yellow-500 pl-4 py-2">
+                                    <h5 class="font-semibold">Local Variables</h5>
+                                    <p class="text-sm">Declared inside procedures/functions with <span class="font-mono font-bold">DECLARE</span>. Only visible within the BEGIN-END block.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-yellow-700 pl-4 py-2">
+                                    <h5 class="font-semibold">Session Variables</h5>
+                                    <p class="text-sm">Start with <span class="font-mono font-bold">@</span> (e.g., <span class="font-mono">@total</span>). Available throughout the session.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-yellow-900 pl-4 py-2">
+                                    <h5 class="font-semibold">Global Variables</h5>
+                                    <p class="text-sm">Start with <span class="font-mono font-bold">@@</span> (e.g., <span class="font-mono">@@global.max_connections</span>). System-wide variables.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Using variables in a stored procedure</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">CalculateOrderSummary</span>(
+    <span class="sql-keyword">IN</span> orderId <span class="sql-keyword">INT</span>
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-comment">-- Declare local variables</span>
+    <span class="sql-keyword">DECLARE</span> subtotal <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">10</span>,<span class="sql-number">2</span>) <span class="sql-keyword">DEFAULT</span> <span class="sql-number">0.00</span>;
+    <span class="sql-keyword">DECLARE</span> taxRate <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">5</span>,<span class="sql-number">2</span>) <span class="sql-keyword">DEFAULT</span> <span class="sql-number">0.08</span>;
+    <span class="sql-keyword">DECLARE</span> taxAmount, totalAmount <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">10</span>,<span class="sql-number">2</span>);
+    
+    <span class="sql-comment">-- Calculate subtotal</span>
+    <span class="sql-keyword">SELECT SUM</span>(quantity * unit_price) 
+    <span class="sql-keyword">INTO</span> subtotal
+    <span class="sql-keyword">FROM</span> order_items
+    <span class="sql-keyword">WHERE</span> order_id = orderId;
+    
+    <span class="sql-comment">-- Calculate tax and total</span>
+    <span class="sql-keyword">SET</span> taxAmount = subtotal * taxRate;
+    <span class="sql-keyword">SET</span> totalAmount = subtotal + taxAmount;
+    
+    <span class="sql-comment">-- Return results</span>
+    <span class="sql-keyword">SELECT</span> 
+        subtotal <span class="sql-keyword">AS</span> order_subtotal,
+        taxAmount <span class="sql-keyword">AS</span> tax,
+        totalAmount <span class="sql-keyword">AS</span> order_total;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conditions -->
+            <section id="condition-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-condition" style="border-left-color: var(--color-condition);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-code-branch mr-2"></i> Conditions
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-800">
+                        Control Flow | Decision Making | Business Logic
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">Conditional Logic in SQL</h3>
+                            <p class="mb-4">MySQL provides IF statements and CASE expressions to implement conditional logic.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">IF vs CASE</h4>
+                            <div class="space-y-3 mb-6">
+                                <div>
+                                    <h5 class="font-semibold text-purple-700">IF Statement</h5>
+                                    <p class="text-sm">Used in stored programs (procedures, functions, triggers). Similar to if-else in programming languages.</p>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-semibold text-purple-700">CASE Expression</h5>
+                                    <p class="text-sm">Can be used in both stored programs and regular SQL queries. Two forms: simple and searched.</p>
+                                </div>
+                            </div>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Logical Operators</h4>
+                            <div class="grid grid-cols-2 gap-2 mb-6">
+                                <div class="bg-gray-100 p-2 rounded text-center">
+                                    <code class="font-mono">AND</code>
+                                </div>
+                                <div class="bg-gray-100 p-2 rounded text-center">
+                                    <code class="font-mono">OR</code>
+                                </div>
+                                <div class="bg-gray-100 p-2 rounded text-center">
+                                    <code class="font-mono">NOT</code>
+                                </div>
+                                <div class="bg-gray-100 p-2 rounded text-center">
+                                    <code class="font-mono">XOR</code>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- IF statement in a procedure</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">CheckInventory</span>(
+    productId <span class="sql-keyword">INT</span>,
+    requestedQty <span class="sql-keyword">INT</span>
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">DECLARE</span> currentStock <span class="sql-keyword">INT</span>;
+    
+    <span class="sql-keyword">SELECT</span> stock_quantity <span class="sql-keyword">INTO</span> currentStock
+    <span class="sql-keyword">FROM</span> products
+    <span class="sql-keyword">WHERE</span> id = productId;
+    
+    <span class="sql-keyword">IF</span> currentStock >= requestedQty <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SELECT</span> <span class="sql-string">'Available'</span> <span class="sql-keyword">AS</span> status;
+    <span class="sql-keyword">ELSEIF</span> currentStock > <span class="sql-number">0</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SELECT</span> <span class="sql-string">'Partial stock available'</span> <span class="sql-keyword">AS</span> status;
+    <span class="sql-keyword">ELSE</span>
+        <span class="sql-keyword">SELECT</span> <span class="sql-string">'Out of stock'</span> <span class="sql-keyword">AS</span> status;
+    <span class="sql-keyword">END IF</span>;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- CASE expression in a SELECT statement</span>
+<span class="sql-keyword">SELECT</span> 
+    name,
+    price,
+    <span class="sql-keyword">CASE</span>
+        <span class="sql-keyword">WHEN</span> price &lt; <span class="sql-number">10</span> <span class="sql-keyword">THEN</span> <span class="sql-string">'Budget'</span>
+        <span class="sql-keyword">WHEN</span> price <span class="sql-keyword">BETWEEN</span> <span class="sql-number">10</span> <span class="sql-keyword">AND</span> <span class="sql-number">50</span> <span class="sql-keyword">THEN</span> <span class="sql-string">'Mid-range'</span>
+        <span class="sql-keyword">ELSE</span> <span class="sql-string">'Premium'</span>
+    <span class="sql-keyword">END</span> <span class="sql-keyword">AS</span> price_category
+<span class="sql-keyword">FROM</span> products;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loops -->
+            <section id="loop-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-loop" style="border-left-color: var(--color-loop);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-redo mr-2"></i> Loops
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-red-100 text-red-800">
+                        Repetition | Iteration | Batch Processing
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">Loop Structures in MySQL</h3>
+                            <p class="mb-4">Loops allow you to execute a block of SQL statements repeatedly until a condition is met.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Types of Loops</h4>
+                            <div class="space-y-3 mb-6">
+                                <div class="border-l-4 border-red-500 pl-4 py-2">
+                                    <h5 class="font-semibold">LOOP</h5>
+                                    <p class="text-sm">Infinite loop that requires LEAVE statement to exit.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-red-600 pl-4 py-2">
+                                    <h5 class="font-semibold">WHILE</h5>
+                                    <p class="text-sm">Loop while a condition is true. Condition checked before each iteration.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-red-700 pl-4 py-2">
+                                    <h5 class="font-semibold">REPEAT</h5>
+                                    <p class="text-sm">Loop until a condition is true (do-while style). Condition checked after each iteration.</p>
+                                </div>
+                            </div>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Control Statements</h4>
+                            <div class="flex space-x-4 mb-6">
+                                <div class="bg-red-50 p-3 rounded-lg flex-1">
+                                    <code class="font-mono font-bold block text-center">LEAVE</code>
+                                    <p class="text-sm text-center mt-1">Exit the loop (like <span class="font-mono">break</span>)</p>
+                                </div>
+                                <div class="bg-red-50 p-3 rounded-lg flex-1">
+                                    <code class="font-mono font-bold block text-center">ITERATE</code>
+                                    <p class="text-sm text-center mt-1">Skip to next iteration (like <span class="font-mono">continue</span>)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Using a WHILE loop to generate test data</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">GenerateTestOrders</span>(
+    customerId <span class="sql-keyword">INT</span>,
+    numOrders <span class="sql-keyword">INT</span>
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">DECLARE</span> counter <span class="sql-keyword">INT DEFAULT</span> <span class="sql-number">1</span>;
+    <span class="sql-keyword">DECLARE</span> orderDate <span class="sql-keyword">DATE</span>;
+    
+    <span class="sql-keyword">WHILE</span> counter &lt;= numOrders <span class="sql-keyword">DO</span>
+        <span class="sql-comment">-- Set order date (past 30 days)</span>
+        <span class="sql-keyword">SET</span> orderDate = <span class="sql-builtin">DATE_SUB</span>(<span class="sql-builtin">CURDATE</span>(), 
+            <span class="sql-keyword">INTERVAL</span> <span class="sql-builtin">FLOOR</span>(<span class="sql-builtin">RAND</span>() * <span class="sql-number">30</span>) <span class="sql-keyword">DAY</span>);
+        
+        <span class="sql-comment">-- Insert test order</span>
+        <span class="sql-keyword">INSERT INTO</span> orders (customer_id, order_date, total_amount)
+        <span class="sql-keyword">VALUES</span> (customerId, orderDate, 
+            <span class="sql-builtin">ROUND</span>(<span class="sql-number">50</span> + (<span class="sql-builtin">RAND</span>() * <span class="sql-number">200</span>), <span class="sql-number">2</span>));
+        
+        <span class="sql-keyword">SET</span> counter = counter + <span class="sql-number">1</span>;
+    <span class="sql-keyword">END WHILE</span>;
+    
+    <span class="sql-keyword">SELECT CONCAT</span>(numOrders, <span class="sql-string">' test orders created'</span>) <span class="sql-keyword">AS</span> result;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- Using LOOP with LEAVE</span>
+<span class="sql-comment">-- (example skeleton)</span>
+<span class="sql-keyword">DECLARE</span> x <span class="sql-keyword">INT DEFAULT</span> <span class="sql-number">0</span>;
+myLoop: <span class="sql-keyword">LOOP</span>
+    <span class="sql-keyword">SET</span> x = x + <span class="sql-number">1</span>;
+    <span class="sql-keyword">IF</span> x > <span class="sql-number">10</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">LEAVE</span> myLoop;
+    <span class="sql-keyword">END IF</span>;
+    <span class="sql-comment">-- Do something...</span>
+<span class="sql-keyword">END LOOP</span> myLoop;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cursors -->
+            <section id="cursor-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-cursor" style="border-left-color: var(--color-cursor);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-mouse-pointer mr-2"></i> Cursors
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-cyan-100 text-cyan-800">
+                        Row-by-row Processing | Result Set Navigation
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">What are Cursors?</h3>
+                            <p class="mb-4">A cursor is a database object used to retrieve and manipulate rows from a result set one row at a time.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">When to Use Cursors</h4>
+                            <ul class="list-disc pl-5 mb-6 space-y-1">
+                                <li>Row-by-row operations that can't be done with set-based SQL</li>
+                                <li>Complex calculations on each row</li>
+                                <li>When you need to process rows in a specific order</li>
+                                <li>Batch processing with progress tracking</li>
+                            </ul>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Cursor Lifecycle</h4>
+                            <div class="space-y-2 mb-6">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-800 flex items-center justify-center mr-3">1</div>
+                                    <span>DECLARE cursor</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-800 flex items-center justify-center mr-3">2</div>
+                                    <span>OPEN cursor</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-800 flex items-center justify-center mr-3">3</div>
+                                    <span>FETCH rows</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-800 flex items-center justify-center mr-3">4</div>
+                                    <span>CLOSE cursor</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Using cursor to process orders row by row</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">ProcessPendingOrders</span>()
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">DECLARE</span> done <span class="sql-keyword">INT DEFAULT</span> <span class="sql-number">0</span>;
+    <span class="sql-keyword">DECLARE</span> orderId <span class="sql-keyword">INT</span>;
+    <span class="sql-keyword">DECLARE</span> orderTotal <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">10</span>,<span class="sql-number">2</span>);
+    <span class="sql-keyword">DECLARE</span> customerEmail <span class="sql-keyword">VARCHAR</span>(<span class="sql-number">255</span>);
+    
+    <span class="sql-comment">-- Declare cursor for pending orders</span>
+    <span class="sql-keyword">DECLARE</span> orderCursor <span class="sql-keyword">CURSOR FOR</span>
+        <span class="sql-keyword">SELECT</span> o.id, o.total_amount, c.email
+        <span class="sql-keyword">FROM</span> orders o
+        <span class="sql-keyword">JOIN</span> customers c <span class="sql-keyword">ON</span> o.customer_id = c.id
+        <span class="sql-keyword">WHERE</span> o.status = <span class="sql-string">'pending'</span>
+        <span class="sql-keyword">ORDER BY</span> o.order_date;
+    
+    <span class="sql-comment">-- Declare continue handler for end of result set</span>
+    <span class="sql-keyword">DECLARE CONTINUE HANDLER FOR NOT FOUND SET</span> done = <span class="sql-number">1</span>;
+    
+    <span class="sql-keyword">OPEN</span> orderCursor;
+    
+    processLoop: <span class="sql-keyword">LOOP</span>
+        <span class="sql-keyword">FETCH</span> orderCursor <span class="sql-keyword">INTO</span> orderId, orderTotal, customerEmail;
+        
+        <span class="sql-keyword">IF</span> done = <span class="sql-number">1</span> <span class="sql-keyword">THEN</span>
+            <span class="sql-keyword">LEAVE</span> processLoop;
+        <span class="sql-keyword">END IF</span>;
+        
+        <span class="sql-comment">-- Process each order (example: send email notification)</span>
+        <span class="sql-comment">-- In real scenario, you might update status, log, etc.</span>
+        <span class="sql-keyword">INSERT INTO</span> order_logs (order_id, action, timestamp)
+        <span class="sql-keyword">VALUES</span> (orderId, <span class="sql-string">'Processed'</span>, <span class="sql-builtin">NOW</span>());
+        
+        <span class="sql-keyword">UPDATE</span> orders
+        <span class="sql-keyword">SET</span> status = <span class="sql-string">'processed'</span>,
+            processed_date = <span class="sql-builtin">NOW</span>()
+        <span class="sql-keyword">WHERE</span> id = orderId;
+        
+    <span class="sql-keyword">END LOOP</span> processLoop;
+    
+    <span class="sql-keyword">CLOSE</span> orderCursor;
+    
+    <span class="sql-keyword">SELECT</span> <span class="sql-string">'Pending orders processed successfully'</span> <span class="sql-keyword">AS</span> message;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Triggers -->
+            <section id="trigger-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-trigger" style="border-left-color: var(--color-trigger);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-bolt mr-2"></i> Triggers
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-pink-100 text-pink-800">
+                        Automatic Execution | Data Integrity | Audit Logging
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">What are Triggers?</h3>
+                            <p class="mb-4">Triggers are stored programs that automatically execute in response to specific events on a table (INSERT, UPDATE, DELETE).</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">Trigger Timing</h4>
+                            <div class="space-y-3 mb-6">
+                                <div class="border-l-4 border-pink-500 pl-4 py-2">
+                                    <h5 class="font-semibold">BEFORE Triggers</h5>
+                                    <p class="text-sm">Execute before the operation. Used for validation, data transformation, or preventing invalid operations.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-pink-700 pl-4 py-2">
+                                    <h5 class="font-semibold">AFTER Triggers</h5>
+                                    <p class="text-sm">Execute after the operation. Used for auditing, logging, or maintaining derived data.</p>
+                                </div>
+                            </div>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">NEW and OLD References</h4>
+                            <div class="space-y-2 mb-6">
+                                <div class="flex items-center">
+                                    <code class="font-mono bg-pink-100 px-2 py-1 rounded mr-3">NEW.column</code>
+                                    <span>Refers to new value (INSERT/UPDATE)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <code class="font-mono bg-pink-100 px-2 py-1 rounded mr-3">OLD.column</code>
+                                    <span>Refers to old value (UPDATE/DELETE)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Create audit log trigger</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE TRIGGER</span> audit_customer_changes
+<span class="sql-keyword">AFTER UPDATE ON</span> customers
+<span class="sql-keyword">FOR EACH ROW</span>
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">INSERT INTO</span> customer_audit (
+        customer_id,
+        changed_field,
+        old_value,
+        new_value,
+        changed_by,
+        change_date
+    )
+    <span class="sql-keyword">VALUES</span> (
+        NEW.id,
+        <span class="sql-string">'email'</span>,
+        OLD.email,
+        NEW.email,
+        <span class="sql-builtin">USER</span>(),
+        <span class="sql-builtin">NOW</span>()
+    );
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- BEFORE INSERT trigger for validation</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE TRIGGER</span> validate_order_amount
+<span class="sql-keyword">BEFORE INSERT ON</span> orders
+<span class="sql-keyword">FOR EACH ROW</span>
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">IF</span> NEW.total_amount &lt;= <span class="sql-number">0</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SIGNAL SQLSTATE</span> <span class="sql-string">'45000'</span>
+        <span class="sql-keyword">SET</span> MESSAGE_TEXT = <span class="sql-string">'Order amount must be greater than 0'</span>;
+    <span class="sql-keyword">END IF</span>;
+    
+    <span class="sql-comment">-- Auto-set order date if not provided</span>
+    <span class="sql-keyword">IF</span> NEW.order_date <span class="sql-keyword">IS NULL</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SET</span> NEW.order_date = <span class="sql-builtin">CURDATE</span>();
+    <span class="sql-keyword">END IF</span>;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SIGNAL SQLSTATE -->
+            <section id="signal-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-signal" style="border-left-color: var(--color-signal);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> SIGNAL SQLSTATE
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-lime-100 text-lime-800">
+                        Error Handling | Custom Errors | Validation
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">What is SIGNAL SQLSTATE?</h3>
+                            <p class="mb-4">The SIGNAL statement is used to return an error or warning condition from a stored program.</p>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">SQLSTATE Codes</h4>
+                            <div class="space-y-3 mb-6">
+                                <div class="border-l-4 border-lime-500 pl-4 py-2">
+                                    <h5 class="font-semibold">'45000' - Unhandled User-defined Exception</h5>
+                                    <p class="text-sm">Most commonly used for custom application errors.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-lime-600 pl-4 py-2">
+                                    <h5 class="font-semibold">'01000' - Warning</h5>
+                                    <p class="text-sm">For non-critical notifications.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-lime-700 pl-4 py-2">
+                                    <h5 class="font-semibold">'HY000' - General Error</h5>
+                                    <p class="text-sm">Generic error when no specific code applies.</p>
+                                </div>
+                            </div>
+                            
+                            <h4 class="font-semibold text-gray-800 mb-2">SIGNAL vs RESIGNAL</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <code class="font-mono bg-lime-100 px-2 py-1 rounded mr-3">SIGNAL</code>
+                                    <span>Raise a new error condition</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <code class="font-mono bg-lime-100 px-2 py-1 rounded mr-3">RESIGNAL</code>
+                                    <span>Pass along an existing error after modification</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3">Examples</h4>
+                            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg code-block mb-4">
+                                <pre><span class="sql-comment">-- Using SIGNAL for validation in a procedure</span>
+<span class="sql-keyword">DELIMITER</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">CREATE PROCEDURE</span> <span class="sql-function">UpdateProductPrice</span>(
+    productId <span class="sql-keyword">INT</span>,
+    newPrice <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">10</span>,<span class="sql-number">2</span>)
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">DECLARE</span> currentPrice <span class="sql-keyword">DECIMAL</span>(<span class="sql-number">10</span>,<span class="sql-number">2</span>);
+    
+    <span class="sql-keyword">SELECT</span> price <span class="sql-keyword">INTO</span> currentPrice
+    <span class="sql-keyword">FROM</span> products
+    <span class="sql-keyword">WHERE</span> id = productId;
+    
+    <span class="sql-comment">-- Validate price increase is not too large</span>
+    <span class="sql-keyword">IF</span> newPrice > currentPrice * <span class="sql-number">1.5</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SIGNAL SQLSTATE</span> <span class="sql-string">'45000'</span>
+        <span class="sql-keyword">SET</span> MESSAGE_TEXT = <span class="sql-string">'Price increase cannot exceed 50%'</span>,
+            MYSQL_ERRNO = <span class="sql-number">1644</span>;
+    <span class="sql-keyword">END IF</span>;
+    
+    <span class="sql-comment">-- Validate price is positive</span>
+    <span class="sql-keyword">IF</span> newPrice &lt;= <span class="sql-number">0</span> <span class="sql-keyword">THEN</span>
+        <span class="sql-keyword">SIGNAL SQLSTATE</span> <span class="sql-string">'45000'</span>
+        <span class="sql-keyword">SET</span> MESSAGE_TEXT = <span class="sql-string">'Price must be greater than 0'</span>;
+    <span class="sql-keyword">END IF</span>;
+    
+    <span class="sql-comment">-- Update the price</span>
+    <span class="sql-keyword">UPDATE</span> products
+    <span class="sql-keyword">SET</span> price = newPrice,
+        last_updated = <span class="sql-builtin">NOW</span>()
+    <span class="sql-keyword">WHERE</span> id = productId;
+    
+    <span class="sql-keyword">SELECT</span> <span class="sql-string">'Price updated successfully'</span> <span class="sql-keyword">AS</span> message;
+<span class="sql-keyword">END</span> <span class="sql-string">//</span>
+
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- Trigger with SIGNAL for data integrity</span>
+<span class="sql-keyword">CREATE TRIGGER</span> prevent_archive_delete
+<span class="sql-keyword">BEFORE DELETE ON</span> archived_orders
+<span class="sql-keyword">FOR EACH ROW</span>
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">SIGNAL SQLSTATE</span> <span class="sql-string">'45000'</span>
+    <span class="sql-keyword">SET</span> MESSAGE_TEXT = <span class="sql-string">'Cannot delete from archived_orders table'</span>;
+<span class="sql-keyword">END</span>;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comparisons -->
+            <section id="comparison-section" class="section-container mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="section-title border-color-comparison" style="border-left-color: var(--color-comparison);">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-balance-scale mr-2"></i> Comparisons
+                    </h2>
+                    <div class="text-sm text-gray-500 mb-4 inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-800">
+                        Decision Guide | When to Use What
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Advanced SQL Concepts Comparison</h3>
+                    
+                    <div class="overflow-x-auto mb-8">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-indigo-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Feature</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Procedure</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Function</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Trigger</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Cursor</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-indigo-800 uppercase tracking-wider">Built-in Functions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Returns Value</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Optional (via OUT params)</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-700">Required</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">No return value</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">No return value</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-orange-700">Always returns value</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Execution</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Explicit CALL</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">In SELECT statement</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-pink-700">Automatic on event</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Inside procedures/functions</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">In any SQL statement</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Custom Code</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700">Yes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-700">Yes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-pink-700">Yes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-cyan-700">Yes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">No (predefined)</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">When to Use</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Complex business logic, batch operations</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Custom calculations, data transformations</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Audit logs, data validation, auto-maintenance</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Row-by-row processing when set operations won't work</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Common operations (math, dates, strings, aggregation)</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Performance</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Good for complex operations</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Good for calculations</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Overhead per row operation</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Slower than set operations</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-700">Highly optimized</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-indigo-50 p-5 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-800 mb-3">Built-in vs User-Defined Functions</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start">
+                                    <i class="fas fa-toolbox text-orange-500 mt-1 mr-2"></i>
+                                    <div>
+                                        <span class="font-semibold">Built-in Functions:</span>
+                                        <p class="text-sm">Predefined, optimized, no CREATE statement needed. Use for common operations.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-code text-green-500 mt-1 mr-2"></i>
+                                    <div>
+                                        <span class="font-semibold">User-Defined Functions:</span>
+                                        <p class="text-sm">Custom logic, CREATE FUNCTION required. Use when built-in functions don't meet your needs.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-5 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-800 mb-3">Function Categories Quick Reference</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>String Operations:</span>
+                                    <code class="font-mono">CONCAT(), SUBSTRING(), REPLACE()</code>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Date/Time:</span>
+                                    <code class="font-mono">NOW(), DATE_ADD(), DATEDIFF()</code>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Numeric:</span>
+                                    <code class="font-mono">ROUND(), CEIL(), FLOOR(), RAND()</code>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Aggregation:</span>
+                                    <code class="font-mono">SUM(), AVG(), COUNT(), MAX()</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-5 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg">
+                        <h4 class="text-lg font-semibold text-indigo-800 mb-3">Quick Decision Guide</h4>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li><span class="font-semibold">Need common operation (math, dates, strings)?</span> → Use <strong>BUILT-IN FUNCTIONS</strong></li>
+                            <li><span class="font-semibold">Need automatic data validation/logging?</span> → Use <strong>TRIGGER</strong></li>
+                            <li><span class="font-semibold">Need custom calculation reusable in queries?</span> → Use <strong>USER-DEFINED FUNCTION</strong></li>
+                            <li><span class="font-semibold">Need complex business logic with transactions?</span> → Use <strong>PROCEDURE</strong></li>
+                            <li><span class="font-semibold">Need row-by-row processing?</span> → Use <strong>CURSOR</strong> inside a procedure</li>
+                            <li><span class="font-semibold">Need custom error messages?</span> → Use <strong>SIGNAL SQLSTATE</strong></li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600">
+            <p class="mb-2">Advanced SQL Guide - Comprehensive MySQL Documentation</p>
+            <p class="text-sm">This guide covers essential advanced SQL concepts with practical examples. Use the search function to quickly find what you need.</p>
+            <div class="mt-4 text-sm">
+                <span class="inline-block mx-2">Built-in Functions</span> •
+                <span class="inline-block mx-2">Stored Procedures</span> •
+                <span class="inline-block mx-2">User-Defined Functions</span> •
+                <span class="inline-block mx-2">Triggers</span> •
+                <span class="inline-block mx-2">Cursors</span> •
+                <span class="inline-block mx-2">Error Handling</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Search Functionality Implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const sections = document.querySelectorAll('.section-container');
+            const resultCount = document.getElementById('resultCount');
+            
+            // Function to perform search
+            function performSearch() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+                
+                // Loop through all sections
+                sections.forEach(section => {
+                    const sectionText = section.textContent.toLowerCase();
+                    const sectionTitle = section.querySelector('h2').textContent.toLowerCase();
+                    
+                    // Check if search term is found in section content or title
+                    if (searchTerm === '' || sectionText.includes(searchTerm) || sectionTitle.includes(searchTerm)) {
+                        section.style.display = 'block';
+                        visibleCount++;
+                        
+                        // Highlight matching text if search term is not empty
+                        if (searchTerm !== '') {
+                            highlightText(section, searchTerm);
+                        } else {
+                            removeHighlights(section);
+                        }
+                    } else {
+                        section.style.display = 'none';
+                        removeHighlights(section);
+                    }
+                });
+                
+                // Update result count
+                resultCount.textContent = `${visibleCount} of ${sections.length} concepts shown`;
+                
+                // Show message if no results found
+                if (visibleCount === 0 && searchTerm !== '') {
+                    resultCount.innerHTML = `<span class="text-red-600">No concepts found for "${searchTerm}"</span>`;
+                }
+            }
+            
+            // Function to highlight matching text in a section
+            function highlightText(section, searchTerm) {
+                // Remove existing highlights first
+                removeHighlights(section);
+                
+                // Don't highlight in code blocks to preserve formatting
+                const textNodes = getTextNodes(section);
+                
+                textNodes.forEach(node => {
+                    // Skip if node is inside a code block
+                    if (node.parentElement.closest('.code-block')) {
+                        return;
+                    }
+                    
+                    const nodeText = node.textContent;
+                    const searchRegex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                    
+                    if (searchRegex.test(nodeText)) {
+                        const highlightedText = nodeText.replace(searchRegex, '<span class="highlight">$1</span>');
+                        const newSpan = document.createElement('span');
+                        newSpan.innerHTML = highlightedText;
+                        node.parentNode.replaceChild(newSpan, node);
+                    }
+                });
+            }
+            
+            // Function to get all text nodes in an element
+            function getTextNodes(element) {
+                const textNodes = [];
+                const walker = document.createTreeWalker(
+                    element, 
+                    NodeFilter.SHOW_TEXT, 
+                    null, 
+                    false
+                );
+                
+                let node;
+                while (node = walker.nextNode()) {
+                    textNodes.push(node);
+                }
+                
+                return textNodes;
+            }
+            
+            // Function to remove all highlights in a section
+            function removeHighlights(section) {
+                const highlights = section.querySelectorAll('.highlight');
+                highlights.forEach(highlight => {
+                    const parent = highlight.parentNode;
+                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                    parent.normalize(); // Merge adjacent text nodes
+                });
+            }
+            
+            // Helper function to escape regex special characters
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            
+            // Add event listener for search input
+            searchInput.addEventListener('input', performSearch);
+            
+            // Add event listener for Enter key to clear search
+            searchInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    searchInput.value = '';
+                    performSearch();
+                }
+            });
+            
+            // Initialize search with empty state
+            performSearch();
+            
+            // Add a note about search functionality
+            console.log('Search functionality active. Type in the search box to filter SQL concepts.');
+            console.log('Search logic: Filters sections based on content match, highlights matching text.');
+            console.log('Built-in functions section includes: String, Numeric, Date/Time, and Aggregate functions.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Sara ❤️</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+  body{
+    overflow:hidden;
+  }
+
+  /* Falling hearts */
+  .falling-heart{
+    position:absolute;
+    top:-10px;
+    animation: fall linear forwards;
+    color:#ff2e63;
+  }
+
+  @keyframes fall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(100vh) rotate(360deg);opacity:0;}
+  }
+
+  /* Welcome animation */
+  .welcome-animate{
+    animation: zoomFade 2s ease forwards;
+  }
+
+  @keyframes zoomFade{
+    0%{opacity:0; transform:scale(0.7);}
+    100%{opacity:1; transform:scale(1);}
+  }
+
+  .fade-out{
+    animation: fadeOut 1s ease forwards;
+  }
+
+  @keyframes fadeOut{
+    to{opacity:0; transform:scale(1.2);}
+  }
+</style>
+</head>
+
+<body class="bg-gradient-to-br from-pink-200 via-red-200 to-pink-300 flex items-center justify-center min-h-screen relative">
+
+<!-- Hearts Container -->
+<div id="hearts"></div>
+
+<!-- Welcome Screen -->
+<div id="welcome" class="absolute text-center welcome-animate">
+  <h1 class="text-5xl font-extrabold text-white drop-shadow-lg">
+    Welcome Sara 💖
+  </h1>
+  <p class="text-2xl text-white mt-4">
+    From Ayyoub ❤️
+  </p>
+</div>
+
+<!-- Main Card -->
+<div id="mainCard" class="hidden bg-white/90 backdrop-blur-lg shadow-2xl rounded-3xl p-12 text-center z-10 max-w-md border border-pink-300">
+
+  <i class="bi bi-heart-fill text-pink-500 text-5xl animate-bounce"></i>
+
+  <h1 class="text-3xl font-bold text-pink-600 mt-4">
+    Happy Valentine's Day 💕
+  </h1>
+
+  <p class="text-gray-700 mt-4 text-lg">
+    Sara... do you love me?
+  </p>
+
+  <div class="mt-8 flex justify-between w-full max-w-xs mx-auto relative">
+
+    <button id="yesBtn"
+      class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-full text-lg shadow-xl transition duration-300 hover:scale-110">
+      <i class="bi bi-heart-fill"></i> Yes
+    </button>
+
+    <button id="noBtn"
+      class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full text-lg shadow-xl transition duration-300">
+      <i class="bi bi-x-circle-fill"></i> No
+    </button>
+
+  </div>
+
+  <p id="response" class="mt-8 text-2xl font-bold text-red-500 hidden">
+    Me toooooo 💘💘💘
+  </p>
+
+</div>
+
+<script>
+const hearts = document.getElementById("hearts");
+const welcome = document.getElementById("welcome");
+const mainCard = document.getElementById("mainCard");
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const response = document.getElementById("response");
+
+/* Falling hearts from sky */
+function createFallingHeart(){
+  const heart = document.createElement("i");
+  heart.className = "bi bi-heart-fill falling-heart";
+  heart.style.left = Math.random()*100 + "vw";
+  heart.style.fontSize = (Math.random()*20 + 15) + "px";
+  heart.style.animationDuration = (Math.random()*3 + 3) + "s";
+  hearts.appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+}
+
+setInterval(createFallingHeart,400);
+
+/* After 3 seconds hide welcome and show main */
+setTimeout(()=>{
+  welcome.classList.add("fade-out");
+  setTimeout(()=>{
+    welcome.classList.add("hidden");
+    mainCard.classList.remove("hidden");
+  },1000);
+},3000);
+
+/* No button moves */
+let moved=false;
+noBtn.addEventListener("mouseover", ()=>{
+  if(!moved){
+    noBtn.classList.add("absolute");
+    moved=true;
+  }
+  const x = Math.random()*(window.innerWidth-120);
+  const y = Math.random()*(window.innerHeight-80);
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+});
+
+/* Yes button */
+yesBtn.addEventListener("click", ()=>{
+  response.classList.remove("hidden");
+  for(let i=0;i<40;i++){
+    createFallingHeart();
+  }
+});
+</script>
+
+</body>
+</html>

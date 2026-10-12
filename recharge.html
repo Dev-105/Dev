@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Recharge Express — Recharge 10 DH Maroc</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.5s ease-out',
+            'float': 'float 3s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --accent: #a855f7;
+      --accent-light: #c084fc;
+      --accent-dark: #7e22ce;
+      --accent-glow: rgba(168, 85, 247, 0.35);
+      --operator-gradient: linear-gradient(135deg, #a855f7, #d946ef);
+      --transition-speed: 0.35s;
+    }
+
+    * { -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0a0a1a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      margin: 0;
+      position: relative;
+      overflow-x: hidden;
+      transition: background var(--transition-speed) ease;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.35;
+      z-index: 0;
+      transition: background var(--transition-speed) ease, opacity var(--transition-speed) ease;
+      animation: float 10s ease-in-out infinite;
+    }
+    body::before {
+      width: 400px; height: 400px;
+      background: var(--accent);
+      top: -120px; left: -120px;
+    }
+    body::after {
+      width: 450px; height: 450px;
+      background: var(--accent-light);
+      bottom: -150px; right: -150px;
+      animation-delay: -4s;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 2rem;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    }
+
+    .operator-card {
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.25rem;
+      padding: 1.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      text-align: center;
+    }
+    .operator-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .operator-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 12px 30px -8px var(--accent-glow);
+      background: rgba(255, 255, 255, 0.08);
+      transform: scale(1.03);
+    }
+    .operator-card.selected::after {
+      content: '\F26E';
+      font-family: 'bootstrap-icons';
+      position: absolute;
+      top: 10px; right: 12px;
+      font-size: 1.2rem;
+      color: var(--accent);
+      animation: fadeInUp 0.25s ease-out;
+    }
+    .operator-card .operator-icon {
+      font-size: 2.2rem;
+      transition: transform var(--transition-speed);
+    }
+    .operator-card.selected .operator-icon { transform: scale(1.15); }
+    .operator-card[data-operator="inwi"].selected {
+      background: linear-gradient(145deg, rgba(168, 85, 247, 0.18), rgba(217, 70, 239, 0.12));
+      border-color: #a855f7;
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.4), 0 12px 30px -8px rgba(168, 85, 247, 0.5);
+    }
+    .operator-card[data-operator="orange"].selected {
+      background: linear-gradient(145deg, rgba(249, 115, 22, 0.18), rgba(245, 158, 11, 0.12));
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4), 0 12px 30px -8px rgba(249, 115, 22, 0.5);
+    }
+    .operator-card[data-operator="iam"].selected {
+      background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(6, 182, 212, 0.12));
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4), 0 12px 30px -8px rgba(59, 130, 246, 0.5);
+    }
+
+    .code-card {
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1rem 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      transition: all var(--transition-speed) ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      text-align: center;
+      position: relative;
+    }
+    .code-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+    }
+    .code-card.selected {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 20px -6px var(--accent-glow);
+      transform: scale(1.03);
+    }
+    .code-card .code-label {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--accent);
+      transition: color var(--transition-speed);
+      letter-spacing: 0.05em;
+    }
+    .code-card.selected .code-label { color: white; }
+    .code-card .code-desc {
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dh10-badge {
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #1e1b4b;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.2rem 0.7rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+      white-space: nowrap;
+    }
+
+    .phone-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    }
+    .phone-input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .phone-input-wrapper.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+    }
+    .phone-input-wrapper input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+    .phone-input-wrapper input::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+      font-weight: 400;
+      letter-spacing: normal;
+    }
+
+    .btn-primary {
+      background: var(--operator-gradient);
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 25px -8px var(--accent-glow);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px -10px var(--accent-glow);
+      filter: brightness(1.1);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(-1px); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-primary .spinner {
+      display: none;
+      width: 1.2rem;
+      height: 1.2rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .btn-primary.loading .spinner { display: inline-block; }
+    .btn-primary.loading .btn-text { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.3);
+      padding: 0 0.25rem;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      flex: 1;
+      transition: color var(--transition-speed);
+    }
+    .step-item.active { color: white; }
+    .step-item.completed { color: var(--accent); }
+    .step-dot {
+      width: 2rem; height: 2rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all var(--transition-speed);
+    }
+    .step-item.active .step-dot {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: white;
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+    .step-item.completed .step-dot {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+    .step-line {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      flex: 0.4;
+      margin: 0 0.1rem;
+      border-radius: 9999px;
+      transition: background var(--transition-speed);
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: min(92%, 420px);
+      pointer-events: none;
+    }
+    .toast {
+      padding: 1rem 1.25rem;
+      border-radius: 1rem;
+      background: rgba(20, 18, 45, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: fadeInUp 0.3s ease-out;
+      pointer-events: auto;
+      line-height: 1.4;
+    }
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.info { border-left: 4px solid var(--accent); }
+    .toast i { font-size: 1.3rem; flex-shrink: 0; }
+    .toast.success i { color: #10b981; }
+    .toast.error i { color: #ef4444; }
+    .toast.info i { color: var(--accent); }
+
+    .preview-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 1.25rem;
+      padding: 1rem 1.25rem;
+      transition: all var(--transition-speed);
+      font-size: 0.85rem;
+    }
+    .preview-card.filled {
+      border-style: solid;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 20px -5px var(--accent-glow);
+    }
+
+    .error-message {
+      color: #fca5a5;
+      font-size: 0.75rem;
+      margin-top: 0.4rem;
+      display: none;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .error-message.visible { display: flex; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      body::before, body::after { animation: none; }
+    }
+
+    @media (max-width: 480px) {
+      .glass-card { border-radius: 1.5rem; padding: 1.25rem; }
+      .operator-card { padding: 1.1rem 0.4rem; }
+      .operator-card .operator-icon { font-size: 1.7rem; }
+      .step-dot { width: 1.65rem; height: 1.65rem; font-size: 0.65rem; }
+      .step-item span:last-child { font-size: 0.55rem; }
+      .code-card .code-label { font-size: 1.1rem; }
+    }
+
+    .section-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
+    .section-hidden {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      height: 0;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="w-full max-w-lg mx-auto relative z-10 animate-fade-in-up">
+    <div class="glass-card p-5 sm:p-8">
+      
+      <header class="text-center mb-7">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/8 backdrop-blur-sm border border-white/10 mb-4 animate-float"
+             style="background: var(--operator-gradient); box-shadow: 0 0 30px var(--accent-glow);">
+          <i class="bi bi-phone text-2xl text-white"></i>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+          Recharge <span style="background-image: var(--operator-gradient); -webkit-background-clip: text; background-clip: text; color: transparent;">Express</span>
+        </h1>
+        <p class="text-sm text-white/40 mt-2">Recharge 10 DH — Maroc 🇲🇦</p>
+      </header>
+
+      <div class="step-indicator mb-7" id="stepIndicator">
+        <div class="step-item active" data-step="1">
+          <div class="step-dot">1</div>
+          <span class="hidden xs:inline">Numéro</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="2">
+          <div class="step-dot">2</div>
+          <span class="hidden xs:inline">Opérateur</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="3">
+          <div class="step-dot">3</div>
+          <span class="hidden xs:inline">Code</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="4">
+          <div class="step-dot">4</div>
+          <span class="hidden xs:inline">Confirmation</span>
+        </div>
+      </div>
+
+      <form id="rechargeForm" novalidate>
+        
+        <section class="mb-7 section-transition" id="sectionPhone">
+          <label class="block text-sm font-medium text-white/70 mb-2.5">
+            <i class="bi bi-phone mr-1.5"></i> Numéro de téléphone
+          </label>
+          <div class="phone-input-wrapper" id="phoneWrapper">
+            <span class="pl-4 pr-2 text-xl">🇲🇦</span>
+            <span class="text-white/50 font-semibold text-sm pr-2">+212</span>
+            <input type="tel" id="phoneInput" placeholder="6 12 34 56 78" maxlength="14" autocomplete="tel" inputmode="numeric" aria-label="Numéro de téléphone marocain">
+            <i class="bi bi-phone text-white/20 pr-4"></i>
+          </div>
+          <div class="error-message" id="phoneError">
+            <i class="bi bi-exclamation-circle"></i>
+            <span id="phoneErrorText">Veuillez entrer un numéro valide (au moins 8 chiffres).</span>
+          </div>
+        </section>
+
+        <section class="mb-7 section-transition" id="sectionOperator">
+          <label class="block text-sm font-medium text-white/70 mb-2.5">
+            <i class="bi bi-sim mr-1.5"></i> Choisissez votre opérateur
+          </label>
+          <div class="grid grid-cols-3 gap-3" id="operatorGrid">
+            <div class="operator-card" data-operator="inwi" role="button" tabindex="0" aria-label="Sélectionner Inwi">
+              <i class="bi bi-wifi operator-icon text-purple-400" style="text-shadow: 0 0 20px rgba(168,85,247,0.6);"></i>
+              <span class="text-xs font-semibold text-white/80">Inwi</span>
+            </div>
+            <div class="operator-card" data-operator="orange" role="button" tabindex="0" aria-label="Sélectionner Orange Maroc">
+              <i class="bi bi-broadcast operator-icon text-orange-400" style="text-shadow: 0 0 20px rgba(249,115,22,0.6);"></i>
+              <span class="text-xs font-semibold text-white/80">Orange</span>
+            </div>
+            <div class="operator-card" data-operator="iam" role="button" tabindex="0" aria-label="Sélectionner Maroc Telecom">
+              <i class="bi bi-signal operator-icon text-blue-400" style="text-shadow: 0 0 20px rgba(59,130,246,0.6);"></i>
+              <span class="text-xs font-semibold text-white/80">IAM</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="mb-7 section-transition section-hidden" id="sectionCode">
+          <label class="block text-sm font-medium text-white/70 mb-2.5">
+            <i class="bi bi-asterisk mr-1.5"></i> Choisissez le code de recharge
+          </label>
+          <div id="codeOptionsContainer" class="grid grid-cols-3 gap-3"></div>
+          <p class="text-center text-white/30 text-xs mt-3">
+            <i class="bi bi-info-circle mr-1"></i>
+            Recharge de <span class="text-white/60 font-semibold">10 DH</span> — le montant est fixe
+          </p>
+        </section>
+
+        <div class="preview-card mb-7" id="previewCard">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-white/40 text-[0.65rem] uppercase tracking-wider font-semibold">Aperçu de la demande</span>
+            <span class="text-white/25 text-[0.65rem]" id="previewEmpty">En attente</span>
+          </div>
+          <div class="grid grid-cols-3 gap-3 text-xs">
+            <div>
+              <span class="text-white/35 block mb-0.5">Opérateur</span>
+              <span class="text-white/80 font-semibold" id="previewOperator">—</span>
+            </div>
+            <div>
+              <span class="text-white/35 block mb-0.5">Numéro</span>
+              <span class="text-white/80 font-semibold" id="previewPhone">—</span>
+            </div>
+            <div>
+              <span class="text-white/35 block mb-0.5">Recharge</span>
+              <span class="text-white/80 font-semibold" id="previewRecharge">—</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full" id="submitBtn" disabled>
+          <span class="spinner"></span>
+          <span class="btn-text"><i class="bi bi-send-fill mr-2"></i>Envoyer la demande — 10 DH</span>
+        </button>
+
+        <p class="text-center text-white/25 text-xs mt-5 leading-relaxed">
+          <i class="bi bi-shield-lock mr-1"></i>
+          Demande sécurisée — aucune recharge automatique sans confirmation.
+        </p>
+      </form>
+    </div>
+
+    <footer class="text-center mt-6 text-white/25 text-xs">
+      <p>&copy; 2025 Recharge Express — Tous droits réservés.</p>
+    </footer>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ================================================================= -->
+  <!-- ============ CONFIGURATION — ONLY 2 VARIABLES NEEDED =========== -->
+  <!-- ================================================================= -->
+  <script>
+    /**
+     * ═══════════════════════════════════════════════════════════════
+     *  🔧 TELEGRAM CONFIGURATION — SET YOUR 2 VARIABLES HERE
+     * ═══════════════════════════════════════════════════════════════
+     * 
+     * 1. TELEGRAM_BOT_TOKEN : Get it from @BotFather on Telegram.
+     * 2. TELEGRAM_CHAT_ID : Your personal chat ID from @userinfobot.
+     * 
+     * ⚠️ SECURITY WARNING:
+     *    For production, move these to a secure backend server.
+     * ═══════════════════════════════════════════════════════════════
+     */
+    
+    const TELEGRAM_BOT_TOKEN = '8967855418:AAG6lMi-cpXFmNm32AAmmT3TNYQhMhjt0lU';
+    const TELEGRAM_CHAT_ID = '5687419212';
+
+    // =================================================================
+    // ==================== OPERATOR CONFIGURATION =====================
+    // =================================================================
+    const OPERATOR_CONFIG = {
+      inwi: {
+        name: 'Inwi',
+        theme: {
+          accent: '#a855f7',
+          accentLight: '#c084fc',
+          accentDark: '#7e22ce',
+          accentGlow: 'rgba(168, 85, 247, 0.35)',
+          gradient: 'linear-gradient(135deg, #a855f7, #d946ef)'
+        },
+        codes: [
+          { id: 'inwi_star3', label: '*3', code: '*3' },
+          { id: 'inwi_star2', label: '*2', code: '*2' },
+          { id: 'inwi_star1', label: '*1', code: '*1' }
+        ]
+      },
+      orange: {
+        name: 'Orange Maroc',
+        theme: {
+          accent: '#f97316',
+          accentLight: '#fb923c',
+          accentDark: '#ea580c',
+          accentGlow: 'rgba(249, 115, 22, 0.35)',
+          gradient: 'linear-gradient(135deg, #f97316, #f59e0b)'
+        },
+        codes: [
+          { id: 'orange_star3', label: '*3', code: '*3' },
+          { id: 'orange_star2', label: '*2', code: '*2' },
+          { id: 'orange_star1', label: '*1', code: '*1' }
+        ]
+      },
+      iam: {
+        name: 'Maroc Telecom',
+        theme: {
+          accent: '#3b82f6',
+          accentLight: '#60a5fa',
+          accentDark: '#2563eb',
+          accentGlow: 'rgba(59, 130, 246, 0.35)',
+          gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+        },
+        codes: [
+          { id: 'iam_star3', label: '*3', code: '*3' },
+          { id: 'iam_star2', label: '*2', code: '*2' },
+          { id: 'iam_star1', label: '*1', code: '*1' }
+        ]
+      }
+    };
+
+    // =================================================================
+    // ======================= STATE & DOM =============================
+    // =================================================================
+    let state = {
+      phone: '',
+      operator: null,
+      selectedCode: null,
+      isSubmitting: false
+    };
+
+    const form = document.getElementById('rechargeForm');
+    const phoneInput = document.getElementById('phoneInput');
+    const phoneWrapper = document.getElementById('phoneWrapper');
+    const phoneError = document.getElementById('phoneError');
+    const phoneErrorText = document.getElementById('phoneErrorText');
+    const operatorCards = document.querySelectorAll('.operator-card');
+    const codeSection = document.getElementById('sectionCode');
+    const codeContainer = document.getElementById('codeOptionsContainer');
+    const previewOperator = document.getElementById('previewOperator');
+    const previewPhone = document.getElementById('previewPhone');
+    const previewRecharge = document.getElementById('previewRecharge');
+    const previewEmpty = document.getElementById('previewEmpty');
+    const previewCard = document.getElementById('previewCard');
+    const submitBtn = document.getElementById('submitBtn');
+    const stepItems = document.querySelectorAll('.step-item');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // =================================================================
+    // ===================== UTILITY FUNCTIONS =========================
+    // =================================================================
+    function showToast(message, type = 'info', duration = 4500) {
+      const icons = {
+        success: 'bi-check-circle-fill',
+        error: 'bi-x-circle-fill',
+        info: 'bi-info-circle-fill'
+      };
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="bi ${icons[type] || icons.info}"></i><span>${message}</span>`;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    function setTheme(operatorKey) {
+      const config = OPERATOR_CONFIG[operatorKey];
+      if (!config) return;
+      const t = config.theme;
+      document.documentElement.style.setProperty('--accent', t.accent);
+      document.documentElement.style.setProperty('--accent-light', t.accentLight);
+      document.documentElement.style.setProperty('--accent-dark', t.accentDark);
+      document.documentElement.style.setProperty('--accent-glow', t.accentGlow);
+      document.documentElement.style.setProperty('--operator-gradient', t.gradient);
+    }
+
+    function resetTheme() {
+      document.documentElement.style.setProperty('--accent', '#a855f7');
+      document.documentElement.style.setProperty('--accent-light', '#c084fc');
+      document.documentElement.style.setProperty('--accent-dark', '#7e22ce');
+      document.documentElement.style.setProperty('--accent-glow', 'rgba(168, 85, 247, 0.35)');
+      document.documentElement.style.setProperty('--operator-gradient', 'linear-gradient(135deg, #a855f7, #d946ef)');
+    }
+
+    function updateSteps() {
+      const step = !state.phone ? 1 : !state.operator ? 2 : !state.selectedCode ? 3 : 4;
+      stepItems.forEach((el, i) => {
+        const stepNum = i + 1;
+        el.classList.toggle('active', stepNum === step);
+        el.classList.toggle('completed', stepNum < step);
+      });
+    }
+
+    function updatePreview() {
+      const hasAny = state.operator || state.phone || state.selectedCode;
+      previewCard.classList.toggle('filled', !!hasAny);
+      previewEmpty.style.display = hasAny ? 'none' : 'inline';
+      
+      previewOperator.textContent = state.operator ? OPERATOR_CONFIG[state.operator].name : '—';
+      
+      if (state.phone && state.phone.length >= 8) {
+        const masked = state.phone.slice(0, -4).replace(/\d/g, '•') + state.phone.slice(-4);
+        previewPhone.textContent = `+212 ${masked}`;
+      } else {
+        previewPhone.textContent = state.phone ? `+212 ${state.phone}` : '—';
+      }
+      
+      if (state.selectedCode) {
+        previewRecharge.textContent = `${state.selectedCode.label} — 10 DH`;
+      } else {
+        previewRecharge.textContent = '—';
+      }
+    }
+
+    // =================================================================
+    // ============ PHONE VALIDATION (RELAXED — 8+ DIGITS) =============
+    // =================================================================
+    function validatePhone(raw) {
+      let cleaned = raw.replace(/[\s\-\(\)]/g, '');
+      cleaned = cleaned.replace(/^(\+212|00212)/, '');
+      cleaned = cleaned.replace(/^0/, '');
+      // Accept any number with at least 8 digits (max 10)
+      const valid = cleaned.length >= 8 && cleaned.length <= 10 && /^\d+$/.test(cleaned);
+      return { valid, normalized: cleaned };
+    }
+
+    function formatPhoneInput(value) {
+      let digits = value.replace(/\D/g, '');
+      if (digits.startsWith('212')) digits = digits.slice(3);
+      if (digits.startsWith('0')) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      let formatted = '';
+      for (let i = 0; i < digits.length; i++) {
+        if (i > 0 && i % 2 === 0) formatted += ' ';
+        formatted += digits[i];
+      }
+      return formatted;
+    }
+
+    function getNormalizedPhone() {
+      let raw = phoneInput.value.replace(/\D/g, '');
+      if (raw.startsWith('212')) raw = raw.slice(3);
+      if (raw.startsWith('0')) raw = raw.slice(1);
+      return raw.slice(0, 10);
+    }
+
+    function checkFormValidity() {
+      const phoneOk = state.phone && state.phone.length >= 8;
+      const operatorOk = !!state.operator;
+      const codeOk = !!state.selectedCode;
+      submitBtn.disabled = !(phoneOk && operatorOk && codeOk) || state.isSubmitting;
+    }
+
+    function hideCodeSection() {
+      codeSection.classList.add('section-hidden');
+      codeContainer.innerHTML = '';
+      state.selectedCode = null;
+    }
+
+    function renderCodeOptions(operatorKey) {
+      const config = OPERATOR_CONFIG[operatorKey];
+      if (!config) return;
+      
+      codeContainer.innerHTML = '';
+      
+      config.codes.forEach(codeOpt => {
+        const card = document.createElement('div');
+        card.className = 'code-card';
+        card.dataset.codeId = codeOpt.id;
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `Sélectionner le code ${codeOpt.label} pour 10 DH`);
+        
+        card.innerHTML = `
+          <span class="dh10-badge">10 DH</span>
+          <span class="code-label">${codeOpt.label}</span>
+          <span class="code-desc">Recharge</span>
+        `;
+        
+        card.addEventListener('click', () => selectCode(codeOpt, card));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectCode(codeOpt, card);
+          }
+        });
+        
+        codeContainer.appendChild(card);
+      });
+      
+      codeSection.classList.remove('section-hidden');
+      
+      if (state.selectedCode) {
+        const existing = codeContainer.querySelector(`[data-code-id="${state.selectedCode.id}"]`);
+        if (existing) {
+          existing.classList.add('selected');
+        } else {
+          state.selectedCode = null;
+        }
+      }
+      
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+    }
+
+    function selectCode(codeOpt, cardEl) {
+      codeContainer.querySelectorAll('.code-card').forEach(el => el.classList.remove('selected'));
+      cardEl.classList.add('selected');
+      state.selectedCode = codeOpt;
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+    }
+
+    function selectOperator(operatorKey) {
+      operatorCards.forEach(card => {
+        card.classList.toggle('selected', card.dataset.operator === operatorKey);
+      });
+      
+      state.operator = operatorKey;
+      state.selectedCode = null;
+      setTheme(operatorKey);
+      renderCodeOptions(operatorKey);
+      
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+    }
+
+    // =================================================================
+    // ==================== TELEGRAM SENDER ============================
+    // =================================================================
+    async function sendToTelegram(payload) {
+      if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || TELEGRAM_CHAT_ID === 'YOUR_CHAT_ID_HERE') {
+        throw new Error('Telegram credentials not configured. Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.');
+      }
+
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      
+      const message = `
+📱 <b>NOUVELLE DEMANDE DE RECHARGE</b>
+━━━━━━━━━━━━━━━━━━━━━
+
+📞 <b>Numéro :</b> <code>+212 ${payload.phoneNormalized}</code>
+📡 <b>Opérateur :</b> ${payload.operatorName}
+🔢 <b>Code :</b> <code>${payload.code}</code>
+💰 <b>Montant :</b> 10 DH
+
+━━━━━━━━━━━━━━━━━━━━━
+🆔 <b>ID :</b> <code>${payload.requestId}</code>
+🕐 <b>Date :</b> ${new Date(payload.timestamp).toLocaleString('fr-MA', { 
+  timeZone: 'Africa/Casablanca',
+  day: '2-digit', month: '2-digit', year: 'numeric',
+  hour: '2-digit', minute: '2-digit', second: '2-digit'
+})}
+━━━━━━━━━━━━━━━━━━━━━
+      `.trim();
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.description || `Telegram API error (${response.status})`);
+      }
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.description || 'Telegram API returned an error');
+      }
+
+      return data;
+    }
+
+    // =================================================================
+    // ===================== EVENT LISTENERS ===========================
+    // =================================================================
+    
+    phoneInput.addEventListener('input', (e) => {
+      const formatted = formatPhoneInput(e.target.value);
+      e.target.value = formatted;
+      
+      const normalized = getNormalizedPhone();
+      state.phone = normalized;
+      
+      const validation = validatePhone(normalized);
+      
+      if (normalized.length === 0) {
+        phoneWrapper.classList.remove('error');
+        phoneError.classList.remove('visible');
+      } else if (!validation.valid && normalized.length >= 10) {
+        phoneWrapper.classList.add('error');
+        phoneError.classList.add('visible');
+        phoneErrorText.textContent = 'Numéro trop long. Maximum 10 chiffres.';
+      } else if (normalized.length < 8) {
+        phoneWrapper.classList.remove('error');
+        phoneError.classList.remove('visible');
+      } else {
+        phoneWrapper.classList.remove('error');
+        phoneError.classList.remove('visible');
+      }
+      
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+    });
+
+    phoneInput.addEventListener('blur', () => {
+      const normalized = getNormalizedPhone();
+      if (normalized.length > 0 && !validatePhone(normalized).valid) {
+        phoneWrapper.classList.add('error');
+        phoneError.classList.add('visible');
+        phoneErrorText.textContent = 'Veuillez entrer un numéro valide (au moins 8 chiffres).';
+      }
+    });
+
+    operatorCards.forEach(card => {
+      card.addEventListener('click', () => selectOperator(card.dataset.operator));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectOperator(card.dataset.operator);
+        }
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (state.isSubmitting) return;
+      
+      const phoneValidation = validatePhone(state.phone);
+      if (!phoneValidation.valid) {
+        showToast('Veuillez entrer un numéro valide (au moins 8 chiffres).', 'error');
+        phoneWrapper.classList.add('error');
+        phoneError.classList.add('visible');
+        phoneErrorText.textContent = 'Veuillez entrer un numéro valide (au moins 8 chiffres).';
+        return;
+      }
+      
+      if (!state.operator) {
+        showToast('Veuillez sélectionner un opérateur.', 'error');
+        return;
+      }
+      
+      if (!state.selectedCode) {
+        showToast('Veuillez sélectionner un code de recharge.', 'error');
+        return;
+      }
+      
+      const confirmed = confirm(
+        `Confirmer la demande de recharge 10 DH ?\n\n` +
+        `📱 Numéro: +212 ${state.phone}\n` +
+        `📡 Opérateur: ${OPERATOR_CONFIG[state.operator].name}\n` +
+        `🔢 Code: ${state.selectedCode.label}\n` +
+        `💰 Montant: 10 DH`
+      );
+      
+      if (!confirmed) return;
+      
+      state.isSubmitting = true;
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      
+      const requestId = 'REQ_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      
+      const payload = {
+        requestId: requestId,
+        phone: '+212' + state.phone,
+        phoneNormalized: state.phone,
+        operator: state.operator,
+        operatorName: OPERATOR_CONFIG[state.operator].name,
+        code: state.selectedCode.label,
+        codeId: state.selectedCode.id,
+        amount: 10,
+        timestamp: new Date().toISOString()
+      };
+      
+      try {
+        await sendToTelegram(payload);
+        showToast(`✅ Demande envoyée avec succès ! ID: ${requestId}`, 'success', 6000);
+        resetForm();
+      } catch (error) {
+        console.error('Submission error:', error);
+        showToast(`❌ ${error.message || 'Erreur de connexion. Veuillez réessayer.'}`, 'error', 6000);
+      } finally {
+        state.isSubmitting = false;
+        submitBtn.classList.remove('loading');
+        checkFormValidity();
+      }
+    });
+
+    function resetForm() {
+      state = { phone: '', operator: null, selectedCode: null, isSubmitting: false };
+      
+      phoneInput.value = '';
+      phoneWrapper.classList.remove('error');
+      phoneError.classList.remove('visible');
+      
+      operatorCards.forEach(card => card.classList.remove('selected'));
+      hideCodeSection();
+      resetTheme();
+      
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+      
+      phoneInput.focus();
+    }
+
+    // =================================================================
+    // ========================= INIT ==================================
+    // =================================================================
+    function init() {
+      resetTheme();
+      hideCodeSection();
+      updateSteps();
+      checkFormValidity();
+      updatePreview();
+      phoneInput.focus();
+      
+      if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || TELEGRAM_CHAT_ID === 'YOUR_CHAT_ID_HERE') {
+        console.warn(
+          '⚠️ Recharge Express: Telegram credentials not configured.\n' +
+          'Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in the script section.'
+        );
+      }
+    }
+
+    init();
+
+    window.__RECHARGE_APP__ = { state, OPERATOR_CONFIG, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID };
+  </script>
+</body>
+</html>

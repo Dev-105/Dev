@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#050506">
+    <!-- PWA Manifest -->
+<link rel="manifest" href="./manifest.json">
+
+<!-- iOS PWA Support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => {
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+</script>
+    <title>Nexus Freelance Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: { 0: '#050506', 1: '#0a0a0c', 2: '#111114', 3: '#18181b', 4: '#1f1f23' },
+                        line: { DEFAULT: '#232327', soft: '#1a1a1e', strong: '#2f2f35' },
+                        brand: { 50:'#ecfdf5',100:'#d1fae5',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b',950:'#022c22' }
+                    },
+                    fontFamily: { sans:['"Plus Jakarta Sans"','system-ui','sans-serif'], serif:['"Playfair Display"','Georgia','serif'], mono:['"JetBrains Mono"','monospace'] },
+                    boxShadow: {
+                        'glow': '0 0 24px -6px rgba(16, 185, 129, 0.35)',
+                        'glow-sm': '0 0 12px -2px rgba(16, 185, 129, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        html, body { background: #050506; color: #e4e4e7; }
+        body { font-family:'Plus Jakarta Sans',system-ui,sans-serif; overscroll-behavior-y:none; -webkit-font-smoothing:antialiased; }
+        ::-webkit-scrollbar { width:3px; height:3px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#232327; border-radius:3px; }
+        body::before {
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:0.035;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+            mix-blend-mode:overlay;
+        }
+        .glass { background:linear-gradient(180deg,rgba(17,17,20,0.95),rgba(10,10,12,0.98)); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); }
+        .card { background:linear-gradient(180deg,#111114 0%,#0d0d0f 100%); border:1px solid #1f1f23; box-shadow:0 1px 0 0 rgba(255,255,255,0.03) inset, 0 4px 16px -8px rgba(0,0,0,0.7); }
+        .card-hover:active { transform:scale(0.985); }
+        .btn-brand { background:linear-gradient(180deg,#10b981 0%,#047857 100%); border:1px solid #059669; box-shadow:0 1px 0 0 rgba(255,255,255,0.15) inset, 0 4px 12px -4px rgba(16,185,129,0.5); }
+        .skeleton { background:linear-gradient(90deg,#111114 0%,#1c1c20 50%,#111114 100%); background-size:200% 100%; animation:shimmer 1.6s infinite; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        #progress-bar { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,#10b981,#34d399); box-shadow:0 0 12px rgba(16,185,129,0.8); width:0%; z-index:200; transition:width 0.3s ease-out,opacity 0.3s; opacity:0; }
+        .tab-content { animation:fadeUp 0.28s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        #active-chat-box { position:fixed; inset:0; z-index:70; background:#050506; display:flex; flex-direction:column; transform:translateY(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); pointer-events:none; }
+        #active-chat-box.open { transform:translateY(0); pointer-events:auto; }
+        .msg-row { opacity:0; transform:translateY(8px); transition:opacity 0.35s ease-out,transform 0.35s ease-out; }
+        .msg-row.shown { opacity:1; transform:translateY(0); }
+        .bubble-me { background:linear-gradient(180deg,#0f766e 0%,#065f46 100%); border:1px solid #047857; box-shadow:0 1px 0 0 rgba(255,255,255,0.06) inset; }
+        .bubble-client { background:linear-gradient(180deg,#18181b 0%,#111114 100%); border:1px solid #232327; }
+        .typing-dot { animation:typing 1.4s infinite; }
+        .typing-dot:nth-child(2){animation-delay:0.2s} .typing-dot:nth-child(3){animation-delay:0.4s}
+        @keyframes typing { 0%,60%,100%{opacity:0.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
+        .home-indicator { position:fixed; bottom:6px; left:50%; transform:translateX(-50%); width:120px; height:4px; background:rgba(255,255,255,0.35); border-radius:999px; z-index:60; pointer-events:none; }
+        body.chat-open .home-indicator { z-index:90; }
+        .tap-target { min-height:44px; min-width:44px; }
+        .no-scroll { overflow:hidden; }
+    </style>
+</head>
+<body class="bg-ink-0 min-h-screen pb-24 antialiased">
+
+    <div id="progress-bar"></div>
+
+    <div id="initial-loader" class="fixed inset-0 z-[100] bg-ink-0 p-4 space-y-3" style="padding-top: calc(env(safe-area-inset-top) + 1.5rem)">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+                <div class="skeleton w-9 h-9 rounded-xl"></div>
+                <div class="space-y-1.5"><div class="skeleton h-2.5 w-28 rounded"></div><div class="skeleton h-2 w-20 rounded"></div></div>
+            </div>
+            <div class="skeleton h-6 w-16 rounded-full"></div>
+        </div>
+        <div class="skeleton h-28 rounded-2xl"></div>
+        <div class="grid grid-cols-2 gap-3"><div class="skeleton h-24 rounded-2xl"></div><div class="skeleton h-24 rounded-2xl"></div></div>
+        <div class="skeleton h-40 rounded-2xl"></div>
+        <div class="skeleton h-32 rounded-2xl"></div>
+        <div class="flex justify-center pt-4"><div class="text-[10px] text-zinc-700 font-mono tracking-wider">Loading workspace...</div></div>
+    </div>
+
+
+    <header class="glass border-b border-line sticky top-0 z-40 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-sm shadow-glow-sm"><i class="bi bi-lightning-charge-fill"></i></div>
+            <div>
+                <h1 class="text-[13px] font-bold text-zinc-50 leading-tight">Nexus Workspace</h1>
+                <p class="text-[10px] text-zinc-500 leading-tight">Verified Pro · Since Dec 2024</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold bg-brand-950/60 text-brand-400 border border-brand-800/60">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse shadow-glow-sm"></span>Online
+            </span>
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" onclick="switchTab('settings')" class="w-8 h-8 rounded-full border-2 border-line-strong object-cover cursor-pointer" />
+        </div>
+    </header>
+
+    <main class="px-3.5 max-w-md mx-auto space-y-3.5 pt-3 relative z-10">
+
+        <div id="view-overview" class="tab-content space-y-3.5">
+            <div class="card rounded-2xl p-4 relative overflow-hidden">
+                <div class="absolute -top-20 -right-16 w-48 h-48 rounded-full bg-brand-500/10 blur-3xl pointer-events-none"></div>
+                <div class="relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Available Balance</span>
+                            <div class="text-[28px] font-extrabold text-zinc-50 mt-1 tracking-tight leading-none">$180<span class="text-zinc-500">.50</span></div>
+                            <div class="text-[10px] text-zinc-500 mt-1.5">USD · withdrawable now</div>
+                        </div>
+                        <div class="p-2.5 bg-brand-950/50 border border-brand-900/60 rounded-xl text-brand-400 shadow-glow-sm"><i class="bi bi-wallet2 text-lg"></i></div>
+                    </div>
+                    <button onclick="switchTab('withdrawals')" class="btn-brand w-full py-2.5 rounded-xl text-white text-xs font-bold tracking-wide mt-1"><i class="bi bi-arrow-down-circle mr-1.5"></i>Withdraw Funds</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="card rounded-2xl p-3.5">
+                    <div class="flex items-center gap-1.5 mb-2"><i class="bi bi-graph-up-arrow text-brand-400 text-xs"></i><span class="text-[10px] text-zinc-500 font-medium">Lifetime Earnings</span></div>
+                    <div class="text-lg font-extrabold text-zinc-50 tracking-tight">$4,280.00</div>
+                    <span class="text-[9px] text-zinc-600 block mt-1">48 completed projects</span>
+                </div>
+                <div class="card rounded-2xl p-3.5">
+                    <div class="flex items-center gap-1.5 mb-2"><i class="bi bi-bank2 text-zinc-500 text-xs"></i><span class="text-[10px] text-zinc-500 font-medium">Total Withdrawn</span></div>
+                    <div class="text-lg font-extrabold text-brand-400 tracking-tight">$4,099.50</div>
+                    <span class="text-[9px] text-zinc-600 block mt-1">Across 8 payouts</span>
+                </div>
+            </div>
+
+            <div class="card rounded-2xl p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <div class="text-xs font-bold text-zinc-100">Revenue Curve</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">Dec 2024 → Oct 2026</div>
+                    </div>
+                    <span class="text-[10px] text-brand-400 font-semibold bg-brand-950/60 border border-brand-900/60 px-2 py-0.5 rounded-full">+14.2% MoM</span>
+                </div>
+                <div class="w-full h-40 relative"><canvas id="salesChart" class="w-full h-full"></canvas></div>
+                <div class="flex justify-between text-[9px] text-zinc-600 mt-1 font-mono">
+                    <span>Dec'24</span><span>Jun'25</span><span>Feb'26</span><span>Oct'26</span>
+                </div>
+            </div>
+
+            <div class="card rounded-2xl p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="text-xs font-bold text-zinc-100">Revenue by Region</div>
+                    <span class="text-[10px] text-zinc-500">16 countries</span>
+                </div>
+                <div class="space-y-3" id="regions-list"></div>
+            </div>
+        </div>
+
+        <div id="view-messages" class="tab-content hidden">
+            <div class="space-y-2">
+                <div class="flex justify-between items-end px-1">
+                    <div>
+                        <h2 class="text-base font-bold text-zinc-100">Inbox</h2>
+                        <p class="text-[10px] text-zinc-500 mt-0.5">
+                            <span class="text-brand-400 font-semibold">36 clients</span> · 48 gigs · 16 countries
+                        </p>
+                    </div>
+                    <button class="w-8 h-8 rounded-full bg-ink-2 border border-line flex items-center justify-center text-zinc-400"><i class="bi bi-search text-xs"></i></button>
+                </div>
+                <div id="client-list-container" class="space-y-1.5 pt-1"></div>
+            </div>
+        </div>
+
+        <div id="view-withdrawals" class="tab-content hidden space-y-3">
+            <div class="card rounded-2xl p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <div class="text-xs font-bold text-zinc-100">Withdrawal History</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">8 payouts · all completed</div>
+                    </div>
+                    <span class="text-[10px] text-brand-400 font-mono font-semibold">$4,099.50</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-brand-950/60 border border-brand-900/60 flex items-center justify-center text-brand-400"><i class="bi bi-bank text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">SEPA Bank Wire</div><div class="text-[10px] text-zinc-500">Oct 12, 2026 · #WD-9941</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-brand-400">$420.00</div><div class="text-[9px] text-zinc-500">Fee $5 · Done</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-950/60 border border-blue-900/60 flex items-center justify-center text-blue-400"><i class="bi bi-paypal text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">PayPal Express</div><div class="text-[10px] text-zinc-500">Jul 05, 2026 · #WD-8720</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$650.00</div><div class="text-[9px] text-zinc-500">Fee $12.50</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-brand-950/60 border border-brand-900/60 flex items-center justify-center text-brand-400"><i class="bi bi-globe text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">SWIFT Wire</div><div class="text-[10px] text-zinc-500">Feb 18, 2026 · #WD-7102</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$810.00</div><div class="text-[9px] text-zinc-500">Fee $15</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-950/60 border border-blue-900/60 flex items-center justify-center text-blue-400"><i class="bi bi-paypal text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">PayPal Express</div><div class="text-[10px] text-zinc-500">Nov 22, 2025 · #WD-5419</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$759.50</div><div class="text-[9px] text-zinc-500">Fee $11.20</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-brand-950/60 border border-brand-900/60 flex items-center justify-center text-brand-400"><i class="bi bi-bank text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">SEPA Bank Wire</div><div class="text-[10px] text-zinc-500">Aug 10, 2025 · #WD-3100</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$600.00</div><div class="text-[9px] text-zinc-500">Fee $5</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-950/60 border border-blue-900/60 flex items-center justify-center text-blue-400"><i class="bi bi-paypal text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">PayPal Express</div><div class="text-[10px] text-zinc-500">Jun 15, 2025 · #WD-2244</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$260.00</div><div class="text-[9px] text-zinc-500">Fee $8</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-brand-950/60 border border-brand-900/60 flex items-center justify-center text-brand-400"><i class="bi bi-bank text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">SEPA Bank Wire</div><div class="text-[10px] text-zinc-500">Mar 20, 2025 · #WD-1180</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$420.00</div><div class="text-[9px] text-zinc-500">Fee $5</div></div>
+                    </div>
+                    <div class="p-3 bg-ink-2 border border-line rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-950/60 border border-blue-900/60 flex items-center justify-center text-blue-400"><i class="bi bi-paypal text-sm"></i></div>
+                            <div><div class="text-[12px] font-semibold text-zinc-100">PayPal Express · First Payout</div><div class="text-[10px] text-zinc-500">Dec 15, 2024 · #WD-0042</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-[12px] font-bold text-zinc-100">$180.00</div><div class="text-[9px] text-zinc-500">Fee $5</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-preview" class="tab-content hidden space-y-3">
+            <div class="card rounded-2xl p-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div><div class="text-xs font-bold text-zinc-100">Live Prototypes</div><div class="text-[10px] text-zinc-500 mt-0.5">Real shipped work</div></div>
+                    <div class="flex space-x-1 p-0.5 bg-ink-0 border border-line rounded-lg">
+                        <button onclick="toggleDemo('perfume')" id="btn-demo-perfume" class="px-2.5 py-1 text-[10px] font-bold rounded-md bg-ink-3 text-brand-400">Perfume</button>
+                        <button onclick="toggleDemo('tech')" id="btn-demo-tech" class="px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-500">FinTech</button>
+                    </div>
+                </div>
+                <div class="border border-line rounded-xl overflow-hidden bg-ink-0">
+                    <div class="bg-ink-2 px-3 py-2 border-b border-line flex items-center justify-between text-[10px]">
+                        <div class="flex space-x-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-900/80"></span><span class="w-2.5 h-2.5 rounded-full bg-yellow-900/80"></span><span class="w-2.5 h-2.5 rounded-full bg-green-900/80"></span></div>
+                        <span id="demo-url" class="font-mono text-zinc-400 text-[9px]">maison-nuit.fr</span>
+                        <i class="bi bi-shield-lock-fill text-brand-500 text-[10px]"></i>
+                    </div>
+                    <div class="p-0 h-[400px] overflow-y-auto" id="preview-frame-box">
+                        <div id="demo-site-perfume" class="text-zinc-100 bg-black min-h-full">
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                <div class="text-[10px] font-serif tracking-[0.25em] text-amber-200">MAISON</div>
+                                <div class="flex gap-3 text-[9px] text-white/50"><span>Shop</span><span>Story</span></div>
+                            </div>
+                            <div class="relative px-5 py-8 bg-gradient-to-b from-amber-950/40 to-transparent">
+                                <div class="text-[8px] font-mono uppercase text-amber-400 tracking-[0.3em] mb-2">Paris · 2026</div>
+                                <h2 class="text-2xl font-serif font-bold leading-tight text-white">L'Élixir<br/>Nuit</h2>
+                                <p class="text-[10px] text-white/50 mt-2 max-w-[200px] leading-relaxed">Amber. Oud. A whisper of smoke. A scent for the hours after dark.</p>
+                            </div>
+                            <div class="mx-4 -mt-2 p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-16 h-20 rounded-md bg-gradient-to-br from-amber-900/40 via-amber-950/60 to-black border border-amber-500/20 flex flex-col items-center justify-center">
+                                        <div class="text-[7px] font-serif text-amber-300/80 tracking-widest">MAISON</div>
+                                        <div class="text-[10px] font-serif text-amber-100 font-bold mt-0.5">Nº5</div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-[11px] font-semibold text-white">Eau de Parfum · 50ml</div>
+                                        <div class="text-[9px] text-white/40 mt-0.5">Amber · Oud · Smoke</div>
+                                        <div class="text-[13px] font-bold text-amber-100 mt-2">€150,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-4 py-4">
+                                <button class="w-full py-2.5 rounded-lg bg-amber-100 text-black text-[11px] font-bold tracking-wide">Add to Cart</button>
+                                <div class="text-center text-[8px] text-white/30 mt-2 font-mono">Built by Ahmed for Pierre · $100 / $90 net</div>
+                            </div>
+                        </div>
+                        <div id="demo-site-tech" class="text-zinc-100 bg-black min-h-full hidden">
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                <div class="flex items-center gap-1.5"><div class="w-4 h-4 rounded bg-emerald-500/20 border border-emerald-500/40"></div><span class="text-[10px] font-bold text-white">Vance</span></div>
+                                <div class="text-[9px] text-white/40">Contact</div>
+                            </div>
+                            <div class="px-5 py-8 bg-gradient-to-b from-emerald-950/30 to-transparent">
+                                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-emerald-800/60 bg-emerald-950/60 text-emerald-400 text-[8px] font-semibold mb-3">
+                                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span> NYC · FinTech
+                                </div>
+                                <h2 class="text-xl font-bold leading-tight text-white">Capital intelligence<br/>for the next decade.</h2>
+                                <p class="text-[10px] text-white/50 mt-2 leading-relaxed">Advisory infrastructure for venture-stage founders. Real-time runway, burn, and deal-flow analytics.</p>
+                            </div>
+                            <div class="mx-4 grid grid-cols-3 gap-2">
+                                <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5 text-center"><div class="text-[13px] font-bold text-white">$2.4B</div><div class="text-[8px] text-white/40 mt-0.5">Managed</div></div>
+                                <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5 text-center"><div class="text-[13px] font-bold text-white">48</div><div class="text-[8px] text-white/40 mt-0.5">Clients</div></div>
+                                <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5 text-center"><div class="text-[13px] font-bold text-emerald-400">14ms</div><div class="text-[8px] text-white/40 mt-0.5">Latency</div></div>
+                            </div>
+                            <div class="px-4 py-4">
+                                <button class="w-full py-2.5 rounded-lg bg-white text-black text-[11px] font-bold">Book a Demo</button>
+                                <div class="text-center text-[8px] text-white/30 mt-2 font-mono">Built by Ahmed for Marcus · $200 / $180 net</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-settings" class="tab-content hidden space-y-3">
+            <div class="card rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-12 h-12 rounded-full border-2 border-brand-800 object-cover shadow-glow-sm" />
+                    <div>
+                        <h2 class="text-[13px] font-bold text-zinc-100">Ahmed K.</h2>
+                        <p class="text-[10px] text-zinc-500">Full-Stack Frontend · Morocco</p>
+                        <div class="flex items-center gap-1 mt-1"><i class="bi bi-patch-check-fill text-brand-400 text-[10px]"></i><span class="text-[9px] text-brand-400 font-semibold">Verified Pro</span></div>
+                    </div>
+                </div>
+                <span class="text-[9px] bg-brand-950/70 text-brand-400 px-2 py-1 rounded-full border border-brand-800/60 font-bold">Lv. 2</span>
+            </div>
+            <div class="card rounded-2xl p-3.5 space-y-1 text-xs">
+                <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1 mb-2">Preferences</h3>
+                <div class="flex items-center justify-between py-2.5 border-b border-line/60">
+                    <div class="flex items-center gap-2.5"><i class="bi bi-translate text-zinc-400"></i><span class="text-zinc-100">Language</span></div>
+                    <select onchange="changeLanguage(this.value)" class="bg-ink-0 border border-line-strong text-zinc-200 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-brand-700">
+                        <option value="en" selected>English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="ar">العربية</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between py-2.5 border-b border-line/60">
+                    <div class="flex items-center gap-2.5"><i class="bi bi-credit-card text-zinc-400"></i><span class="text-zinc-100">Payout Accounts</span></div>
+                    <span class="text-[10px] text-zinc-400">SEPA · PayPal</span>
+                </div>
+                <div class="flex items-center justify-between py-2.5 border-b border-line/60">
+                    <div class="flex items-center gap-2.5"><i class="bi bi-shield-lock text-zinc-400"></i><span class="text-zinc-100">2FA Security</span></div>
+                    <span class="text-[10px] text-brand-400 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>Enabled</span>
+                </div>
+                <div class="flex items-center justify-between py-2.5">
+                    <div class="flex items-center gap-2.5"><i class="bi bi-percent text-zinc-400"></i><span class="text-zinc-100">Platform Fee</span></div>
+                    <span class="text-[10px] text-zinc-400">10% Standard</span>
+                </div>
+            </div>
+            <div class="card rounded-2xl p-3.5 space-y-2">
+                <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Quick Actions</h3>
+                <button onclick="toast('Password reset link sent.')" class="w-full bg-ink-2 border border-line text-zinc-200 active:bg-ink-3 py-2.5 rounded-xl text-[12px] font-medium text-left px-3 flex items-center justify-between tap-target">
+                    <span><i class="bi bi-key mr-2 text-zinc-500"></i>Change Password</span><i class="bi bi-chevron-right text-zinc-600"></i>
+                </button>
+                <button onclick="toast('Tax statement 2025/2026 generated.')" class="w-full bg-ink-2 border border-line text-zinc-200 active:bg-ink-3 py-2.5 rounded-xl text-[12px] font-medium text-left px-3 flex items-center justify-between tap-target">
+                    <span><i class="bi bi-file-earmark-pdf mr-2 text-zinc-500"></i>Download Tax Report</span><i class="bi bi-chevron-right text-zinc-600"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="active-chat-box">
+        <div class="glass border-b border-line px-3 py-2.5 flex items-center justify-between shrink-0" style="padding-top: calc(env(safe-area-inset-top) + 0.5rem)">
+            <div class="flex items-center gap-2">
+                <button onclick="closeChat()" class="tap-target flex items-center justify-center text-zinc-300"><i class="bi bi-chevron-left text-lg"></i></button>
+                <div class="flex items-center gap-2.5">
+                    <div id="chat-avatar" class="w-9 h-9 rounded-full bg-ink-3 border border-line flex items-center justify-center text-[11px] font-bold text-zinc-200">--</div>
+                    <div>
+                        <h2 class="text-[12px] font-bold text-zinc-100 leading-tight" id="chat-title-name">--</h2>
+                        <p class="text-[10px] text-zinc-500 leading-tight" id="chat-title-sub">--</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span id="chat-status-badge" class="text-[9px] px-2 py-0.5 rounded-full border font-semibold">--</span>
+                <button class="tap-target w-8 h-8 flex items-center justify-center text-zinc-400"><i class="bi bi-three-dots-vertical text-sm"></i></button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 py-3" id="chat-messages-container"></div>
+
+        <div id="chat-loading" class="absolute inset-0 bg-ink-0 z-10 flex items-center justify-center" style="top: 60px; bottom: 65px;">
+            <div class="flex flex-col items-center gap-3">
+                <div class="flex gap-1.5">
+                    <span class="typing-dot w-2 h-2 rounded-full bg-brand-500"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-brand-500"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-brand-500"></span>
+                </div>
+                <div class="text-[10px] text-zinc-600 font-mono tracking-wider">Loading messages...</div>
+            </div>
+        </div>
+
+        <div class="glass border-t border-line px-2.5 py-2 flex items-end gap-2 shrink-0" style="padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem)">
+            <button class="tap-target flex items-center justify-center text-zinc-500 mb-0.5"><i class="bi bi-plus-circle text-lg"></i></button>
+            <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-ink-2 border border-line-strong rounded-full px-3.5 py-2 text-[12px] text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-brand-700 focus:ring-1 focus:ring-brand-900/50" onkeypress="handleEnterMessage(event)">
+            <button onclick="sendUserMessage()" class="tap-target w-9 h-9 rounded-full btn-brand flex items-center justify-center text-white shadow-glow-sm"><i class="bi bi-arrow-up text-sm font-bold"></i></button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[80] flex flex-col gap-2 items-center pointer-events-none"></div>
+
+    <nav class="glass fixed bottom-0 left-0 right-0 border-t border-line z-40 px-2 pb-3 pt-1.5">
+        <div class="max-w-md mx-auto flex justify-around items-center text-center">
+            <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn active flex-1 py-1 text-brand-400"><i class="bi bi-grid-1x2 text-base block"></i><span class="text-[9px] font-semibold mt-0.5 block">Overview</span></button>
+            <button onclick="switchTab('messages')" id="nav-messages" class="nav-btn flex-1 py-1 text-zinc-500"><i class="bi bi-chat-left-text text-base block"></i><span class="text-[9px] font-semibold mt-0.5 block">Messages</span></button>
+            <button onclick="switchTab('withdrawals')" id="nav-withdrawals" class="nav-btn flex-1 py-1 text-zinc-500"><i class="bi bi-bank text-base block"></i><span class="text-[9px] font-semibold mt-0.5 block">Payouts</span></button>
+            <button onclick="switchTab('preview')" id="nav-preview" class="nav-btn flex-1 py-1 text-zinc-500"><i class="bi bi-display text-base block"></i><span class="text-[9px] font-semibold mt-0.5 block">Demos</span></button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex-1 py-1 text-zinc-500"><i class="bi bi-gear text-base block"></i><span class="text-[9px] font-semibold mt-0.5 block">Settings</span></button>
+        </div>
+    </nav>
+
+    <div class="home-indicator"></div>
+
+    <script>
+        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function toast(msg) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'bg-ink-2 border border-line text-zinc-100 text-[11px] font-medium px-4 py-2.5 rounded-full pointer-events-auto';
+            t.style.animation = 'fadeUp 0.3s ease-out';
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2400);
+        }
+
+        const progressBar = document.getElementById('progress-bar');
+        function startProgress() {
+            progressBar.style.opacity = '1';
+            progressBar.style.width = '20%';
+            setTimeout(() => { progressBar.style.width = '70%'; }, 100);
+        }
+        function completeProgress() {
+            progressBar.style.width = '100%';
+            setTimeout(() => { progressBar.style.opacity = '0'; setTimeout(() => { progressBar.style.width = '0%'; }, 250); }, 200);
+        }
+
+        // ============ 36 CLIENTS ACROSS 22 MONTHS ============
+        const clients = [
+            // ACTIVE (3) - today
+            { key:'pierre', name:'Pierre Laurent', country:'France', flag:'🇫🇷', initials:'PL', color:'blue', section:'active', unread:2, time:'12:14', preview:'Will send you the footer task next week 👍', badge:'Net $90.00', badgeType:'brand', repeat:2 },
+            { key:'emma', name:'Emma Wright', country:'United Kingdom', flag:'🇬🇧', initials:'EW', color:'violet', section:'active', unread:1, time:'11:48', preview:'Fourth project next quarter — save me a slot 😊', badge:'Net $80.75', badgeType:'brand', repeat:3 },
+            { key:'yuki', name:'Yuki Tanaka', country:'Japan', flag:'🇯🇵', initials:'YT', color:'rose', section:'active', unread:1, time:'09:22', preview:'Very professional. Will recommend you to our team.', badge:'Net $68.00', badgeType:'brand', repeat:2 },
+            // THIS WEEK (5)
+            { key:'marcus', name:'Marcus Vance', country:'USA', flag:'🇺🇸', initials:'MV', color:'purple', section:'week', time:'Yesterday', preview:'Contract closed & $200 released. Great work!', badge:'Net $180.00', badgeType:'brand', repeat:3 },
+            { key:'sarah', name:'Sarah Jenkins', country:'Canada', flag:'🇨🇦', initials:'SJ', color:'rose', section:'week', time:'Mon', preview:'Milestone released: $139.50. Excellent work!', badge:'Net $139.50', badgeType:'brand', repeat:1 },
+            { key:'claire', name:'Claire Moreau', country:'France', flag:'🇫🇷', initials:'CM', color:'amber', section:'week', time:'Mon', preview:'Order #3391 closed. Merci beaucoup!', badge:'Net $85.00', badgeType:'brand', repeat:1 },
+            { key:'david', name:'David Ross', country:'USA', flag:'🇺🇸', initials:'DR', color:'slate', section:'week', time:'Fri', preview:'Quick fix delivered. $70 released. Cheers!', badge:'Net $59.50', badgeType:'brand', repeat:1 },
+            { key:'sofia', name:'Sofia Rossi', country:'Italy', flag:'🇮🇹', initials:'SR', color:'emerald', section:'week', time:'Thu', preview:'Grazie mille! Works perfectly.', badge:'Net $51.00', badgeType:'brand', repeat:1 },
+            // RECENT (14) - Sep-Oct 2026
+            { key:'carlos', name:'Carlos Mendes', country:'Brazil', flag:'🇧🇷', initials:'CM', color:'yellow', section:'recent', time:'Oct 28', preview:'Muito bom! Small tweaks coming.', badge:'Net $153.00', badgeType:'brand', repeat:1 },
+            { key:'raj', name:'Raj Patel', country:'India', flag:'🇮🇳', initials:'RP', color:'orange', section:'recent', time:'Oct 25', preview:'Awesome as always. You\'re my go-to now.', badge:'Net $165.75', badgeType:'brand', repeat:4 },
+            { key:'fatima', name:'Fatima Al-Rashid', country:'UAE', flag:'🇦🇪', initials:'FA', color:'teal', section:'recent', time:'Oct 22', preview:'Very thorough. Shukran!', badge:'Net $102.00', badgeType:'brand', repeat:1 },
+            { key:'anna', name:'Anna Schmidt', country:'Germany', flag:'🇩🇪', initials:'AS', color:'red', section:'recent', time:'Oct 20', preview:'Perfect. Payment released.', badge:'Net $119.00', badgeType:'brand', repeat:2 },
+            { key:'marco', name:'Marco Bianchi', country:'Italy', flag:'🇮🇹', initials:'MB', color:'lime', section:'recent', time:'Oct 18', preview:'Perfect as always.', badge:'Net $29.75', badgeType:'brand', repeat:4 },
+            { key:'akira', name:'Akira Sato', country:'Japan', flag:'🇯🇵', initials:'AS', color:'indigo', section:'recent', time:'Oct 15', preview:'Thank you very much.', badge:'Net $38.25', badgeType:'brand', repeat:1 },
+            { key:'isabella', name:'Isabella Costa', country:'Portugal', flag:'🇵🇹', initials:'IC', color:'fuchsia', section:'recent', time:'Oct 12', preview:'Linda! Bela trabalho.', badge:'Net $110.50', badgeType:'brand', repeat:1 },
+            { key:'henrik', name:'Henrik Larsen', country:'Denmark', flag:'🇩🇰', initials:'HL', color:'cyan', section:'recent', time:'Oct 08', preview:'Done. Added friendly browser-upgrade banner.', badge:'Net $25.50', badgeType:'brand', repeat:1 },
+            { key:'olivia', name:'Olivia Brown', country:'Australia', flag:'🇦🇺', initials:'OB', color:'pink', section:'recent', time:'Oct 02', preview:'Done. Booking form live.', badge:'Net $93.50', badgeType:'brand', repeat:1 },
+            { key:'pablo', name:'Pablo Lopez', country:'Spain', flag:'🇪🇸', initials:'PL', color:'red', section:'recent', time:'Sep 28', preview:'Perfecto.', badge:'Net $46.75', badgeType:'brand', repeat:1 },
+            { key:'nina', name:'Nina Petrov', country:'Netherlands', flag:'🇳🇱', initials:'NP', color:'orange', section:'recent', time:'Sep 22', preview:'Fixed and tested. Thank you!', badge:'Net $55.25', badgeType:'brand', repeat:1 },
+            { key:'hans', name:'Hans Meyer', country:'Germany', flag:'🇩🇪', initials:'HM', color:'yellow', section:'recent', time:'Sep 18', preview:'Understood. Budget exceeded. We\'ll hold.', badge:'Declined', badgeType:'amber', repeat:1 },
+            { key:'lucas', name:'Lukas Weber', country:'Switzerland', flag:'🇨🇭', initials:'LW', color:'red', section:'recent', time:'Sep 12', preview:'Project cancelled. Hired internal dev.', badge:'Cancelled', badgeType:'red', repeat:1 },
+            { key:'julien', name:'Julien Dubois', country:'Belgium', flag:'🇧🇪', initials:'JD', color:'gray', section:'recent', time:'Sep 05', preview:'Hello? Are you available for a quick CSS fix?', badge:'No reply', badgeType:'gray', repeat:1 },
+            // EARLIER 2026 (5)
+            { key:'ravi', name:'Ravi Kumar', country:'India', flag:'🇮🇳', initials:'RK', color:'orange', section:'2026', time:'Aug 2026', preview:'Full store for $15 — declined.', badge:'Declined', badgeType:'amber', repeat:1 },
+            { key:'tom', name:'Tom Anderson', country:'USA', flag:'🇺🇸', initials:'TA', color:'slate', section:'2026', time:'Jul 2026', preview:'Asked for rate, then vanished.', badge:'No reply', badgeType:'gray', repeat:1 },
+            { key:'chiara', name:'Chiara Ferretti', country:'Italy', flag:'🇮🇹', initials:'CF', color:'rose', section:'2026', time:'May 2026', preview:'Wanted an estimate, then disappeared.', badge:'No reply', badgeType:'gray', repeat:1 },
+            { key:'keiko', name:'Keiko Yamamoto', country:'Japan', flag:'🇯🇵', initials:'KY', color:'pink', section:'2026', time:'Feb 2026', preview:'Carousel fixed. Arigatou!', badge:'Net $85.50', badgeType:'brand', repeat:1 },
+            { key:'thomas', name:'Thomas Müller', country:'Germany', flag:'🇩🇪', initials:'TM', color:'cyan', section:'2026', time:'Jan 2026', preview:'Header animation perfect.', badge:'Net $117.00', badgeType:'brand', repeat:2 },
+            // 2025 (5)
+            { key:'marie', name:'Marie Dubois', country:'France', flag:'🇫🇷', initials:'MD', color:'violet', section:'2025', time:'Nov 2025', preview:'Merci Ahmed! À bientôt.', badge:'Net $81.00', badgeType:'brand', repeat:2 },
+            { key:'pedro', name:'Pedro Silva', country:'Mexico', flag:'🇲🇽', initials:'PS', color:'emerald', section:'2025', time:'Sep 2025', preview:'Form spam fixed. Gracias!', badge:'Net $72.00', badgeType:'brand', repeat:1 },
+            { key:'aisha', name:'Aisha Ibrahim', country:'Egypt', flag:'🇪🇬', initials:'AI', color:'amber', section:'2025', time:'Jul 2025', preview:'RTL audit complete. Shukran.', badge:'Net $67.50', badgeType:'brand', repeat:1 },
+            { key:'oliver', name:'Oliver Kelly', country:'Ireland', flag:'🇮🇪', initials:'OK', color:'lime', section:'2025', time:'May 2025', preview:'Booking widget works flawlessly.', badge:'Net $99.00', badgeType:'brand', repeat:1 },
+            { key:'yuna', name:'Yuna Park', country:'South Korea', flag:'🇰🇷', initials:'YP', color:'fuchsia', section:'2025', time:'Mar 2025', preview:'Menu fixed. Thank you!', badge:'Net $76.50', badgeType:'brand', repeat:1 },
+            // 2024 · FIRST YEAR (4)
+            { key:'khalid', name:'Khalid Benali', country:'Morocco', flag:'🇲🇦', initials:'KB', color:'brand', section:'2024', time:'Dec 2024', preview:'أول زبون! Fix worked perfectly. 🙏', badge:'Net $36.00', badgeType:'brand', repeat:1, first:true },
+            { key:'jake', name:'Jake Thompson', country:'USA', flag:'🇺🇸', initials:'JT', color:'blue', section:'2024', time:'Sep 2024', preview:'First US client. Landing page shipped.', badge:'Net $108.00', badgeType:'brand', repeat:1, first:true },
+            { key:'minji', name:'Min-ji Park', country:'South Korea', flag:'🇰🇷', initials:'MP', color:'indigo', section:'2024', time:'Jun 2024', preview:'Blog layout fixed. 감사합니다!', badge:'Net $45.00', badgeType:'brand', repeat:1, first:true },
+            { key:'mohammed', name:'Mohammed Ali', country:'Egypt', flag:'🇪🇬', initials:'MA', color:'teal', section:'2024', time:'Mar 2024', preview:'Full site for $10 — declined.', badge:'Declined', badgeType:'amber', repeat:1 }
+        ];
+
+        const colorMap = {
+            blue:'from-blue-800 to-blue-950 border-blue-900/70 text-blue-200', violet:'from-violet-800 to-violet-950 border-violet-900/70 text-violet-200',
+            purple:'from-purple-800 to-purple-950 border-purple-900/70 text-purple-200', rose:'from-rose-800 to-rose-950 border-rose-900/70 text-rose-200',
+            amber:'from-amber-800 to-amber-950 border-amber-900/70 text-amber-200', slate:'from-slate-700 to-slate-900 border-slate-800 text-slate-300',
+            emerald:'from-emerald-800 to-emerald-950 border-emerald-900/70 text-emerald-200', yellow:'from-yellow-800 to-yellow-950 border-yellow-900/70 text-yellow-200',
+            orange:'from-orange-800 to-orange-950 border-orange-900/70 text-orange-200', teal:'from-teal-800 to-teal-950 border-teal-900/70 text-teal-200',
+            red:'from-red-900 to-red-950 border-red-900/70 text-red-200', lime:'from-lime-800 to-lime-950 border-lime-900/70 text-lime-200',
+            indigo:'from-indigo-800 to-indigo-950 border-indigo-900/70 text-indigo-200', fuchsia:'from-fuchsia-800 to-fuchsia-950 border-fuchsia-900/70 text-fuchsia-200',
+            cyan:'from-cyan-800 to-cyan-950 border-cyan-900/70 text-cyan-200', pink:'from-pink-800 to-pink-950 border-pink-900/70 text-pink-200',
+            gray:'from-ink-3 to-ink-4 border-line text-zinc-400', brand:'from-brand-700 to-brand-900 border-brand-800/70 text-brand-100'
+        };
+
+        const badgeMap = {
+            brand:'bg-brand-950/70 text-brand-400 border-brand-800/60', amber:'bg-amber-950/70 text-amber-400 border-amber-800/60',
+            red:'bg-red-950/70 text-red-400 border-red-800/60', gray:'bg-ink-2 text-zinc-500 border-line'
+        };
+
+        function renderClientList() {
+            const container = document.getElementById('client-list-container');
+            const sections = [
+                { id:'active', label:'Active Now', dot:true },
+                { id:'week', label:'This Week', dot:false },
+                { id:'recent', label:'Recent', dot:false },
+                { id:'2026', label:'Earlier 2026', dot:false },
+                { id:'2025', label:'2025', dot:false },
+                { id:'2024', label:'2024 · First Year', dot:false }
+            ];
+            container.innerHTML = '';
+            sections.forEach(sec => {
+                const list = clients.filter(c => c.section === sec.id);
+                if (!list.length) return;
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center gap-2 px-1 pt-2 pb-1';
+                header.innerHTML = `
+                    ${sec.dot ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-500 shadow-glow-sm"></span>' : ''}
+                    <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">${sec.label}</span>
+                    <span class="text-[9px] text-zinc-700">${list.length}</span>
+                `;
+                container.appendChild(header);
+
+                list.forEach(c => {
+                    const card = document.createElement('div');
+                    card.className = 'card card-hover rounded-2xl p-3 cursor-pointer transition flex items-center gap-3';
+                    card.onclick = () => openChat(c.key);
+
+                    const repeatBadge = c.repeat > 1 ? `<span class="text-[8px] text-zinc-500 font-mono">×${c.repeat}</span>` : '';
+                    const firstBadge = c.first ? '<span class="text-[8px] text-amber-400 font-mono">⭐</span>' : '';
+
+                    card.innerHTML = `
+                        <div class="relative shrink-0">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${colorMap[c.color]} border flex items-center justify-center text-[11px] font-bold">${c.initials}</div>
+                            ${c.unread ? `<span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-brand-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-ink-0 shadow-glow-sm">${c.unread}</span>` : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-baseline gap-2">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="text-[12px] font-bold text-zinc-100 truncate">${c.name}</span>
+                                    ${repeatBadge}${firstBadge}
+                                </div>
+                                <span class="text-[10px] text-zinc-500 shrink-0">${c.time}</span>
+                            </div>
+                            <div class="flex justify-between items-baseline gap-2 mt-0.5">
+                                <div class="text-[11px] text-zinc-400 truncate">${c.preview}</div>
+                                <span class="text-[9px] ${badgeMap[c.badgeType]} px-1.5 py-0.5 rounded-full border font-semibold shrink-0">${c.badge}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // ============ CHAT STORE (36 clients) ============
+        const chatStore = {
+            pierre: { name:'Pierre Laurent', sub:'France · Shopify cart bug', initials:'PL', color:'blue', messages:[
+                {sender:'client',time:'09:14',text:'Bonjour Ahmed 👋'},{sender:'client',time:'09:14',text:'Do you have availability this week? We have a small emergency.'},
+                {sender:'me',time:'09:22',text:'Bonjour Pierre! Yes — 2 slots open. What\'s happening?'},{sender:'client',time:'09:24',text:'Add-to-cart drawer doesn\'t open on iOS Safari.'},
+                {sender:'client',time:'09:25',type:'image',text:'[Screenshot: cart icon unresponsive on iPhone]'},{sender:'client',time:'09:25',text:'We\'ve lost 3 orders today already 😞'},
+                {sender:'me',time:'09:31',text:'Looks like an event listener conflict with smooth-scroll. Can you share staging?'},{sender:'client',time:'09:36',text:'Sent credentials. Staging is staging.pierre-store.com.'},
+                {sender:'me',time:'09:39',text:'Got it. ETA ~2 hours. $100 fixed.'},{sender:'client',time:'09:40',text:'Fair. Creating milestone now.'},
+                {sender:'system',time:'09:41',text:'💰 Escrow funded · $100.00'},{sender:'me',time:'11:08',text:'Root cause: e.preventDefault() blocks touchstart on WebKit. Testing fix now.'},
+                {sender:'client',time:'11:11',text:'Super! 🙏'},{sender:'me',time:'11:48',type:'link',text:'staging.pierre-store.com — fix deployed'},
+                {sender:'client',time:'12:04',text:'works perfectly on iPhone 14 🎉'},{sender:'client',time:'12:05',text:'wait — one more thing. Close button small on mobile?'},
+                {sender:'me',time:'12:08',text:'Quick fix — done. Refresh staging.'},{sender:'client',time:'12:11',text:'Parfait! Releasing the payment.'},
+                {sender:'system',time:'12:12',text:'💸 Milestone released · $100.00 → net $90.00'},{sender:'client',time:'12:13',text:'Thanks Ahmed. Footer task next week 👍'}
+            ]},
+            emma: { name:'Emma Wright', sub:'United Kingdom · WooCommerce', initials:'EW', color:'violet', messages:[
+                {sender:'client',time:'Mon 10:22',text:'Hi Ahmed! Remember me from last month?'},{sender:'me',time:'Mon 10:24',text:'Emma! Of course. Everything smooth?'},
+                {sender:'client',time:'Mon 10:25',text:'Yes! Need a product filter addition now. Same style.'},{sender:'me',time:'Mon 10:27',text:'$95 flat — filter + sort. ETA 1 day.'},
+                {sender:'system',time:'Mon 10:30',text:'💰 Escrow funded · $95.00'},{sender:'me',time:'Tue 14:14',type:'link',text:'staging.emma-store.co.uk — filter live'},
+                {sender:'client',time:'Tue 14:44',text:'Tested — beautiful work as always!'},{sender:'system',time:'Tue 14:45',text:'💸 Milestone released · $95.00 → net $80.75'},
+                {sender:'client',time:'Tue 14:46',text:'Fourth project next quarter — save me a slot 😊'}
+            ]},
+            yuki: { name:'Yuki Tanaka', sub:'Japan · Pricing table fix', initials:'YT', color:'rose', messages:[
+                {sender:'client',time:'08:02',text:'Ahmed-san, hello again.'},{sender:'client',time:'08:03',text:'Pricing table broken on iPad only.'},
+                {sender:'client',time:'08:03',type:'image',text:'[Screenshot: iPad pricing table broken]'},{sender:'me',time:'08:22',text:'Hi Yuki! Media query issue. $80 fixed. 2 hours.'},
+                {sender:'system',time:'08:25',text:'💰 Escrow funded · $80.00'},{sender:'me',time:'10:40',text:'Fixed. Tested on iPad Mini, Pro, and Air.'},
+                {sender:'client',time:'10:44',text:'Perfect. Also — do you test on real hardware?'},{sender:'me',time:'10:46',text:'Always. BrowserStack + real devices.'},
+                {sender:'system',time:'10:47',text:'💸 Milestone released · $80.00 → net $68.00'},{sender:'client',time:'10:48',text:'Very professional. Will recommend you to our team.'}
+            ]},
+            marcus: { name:'Marcus Vance', sub:'USA · FinTech landing', initials:'MV', color:'purple', messages:[
+                {sender:'client',time:'Mon 14:02',text:'Hey Ahmed — need a dark landing page for our NYC venture firm.'},{sender:'client',time:'Mon 14:02',text:'Fixed budget $200. ETA?'},
+                {sender:'me',time:'Mon 14:18',text:'Hi Marcus. Tailwind + scroll reveals. 2 days.'},{sender:'client',time:'Mon 14:19',text:'Yep. Send proposal.'},
+                {sender:'me',time:'Mon 14:22',text:'Sent. Scope: hero, stats, features, CTA + responsive.'},{sender:'client',time:'Mon 14:25',text:'Approved. Escrow funded.'},
+                {sender:'system',time:'Mon 14:26',text:'💰 Escrow funded · $200.00'},{sender:'me',time:'Tue 10:16',type:'link',text:'vance-advisory.nexus-demo.io'},
+                {sender:'client',time:'Tue 11:40',text:'Typography is 🔥. Two things:'},{sender:'client',time:'Tue 11:41',text:'1. Hero subtitle heavy. 2. Push stats closer to fold.'},
+                {sender:'me',time:'Tue 12:05',text:'Both done. Pushed.'},{sender:'client',time:'Tue 12:20',text:'Perfect. Animate stat counters on scroll?'},
+                {sender:'me',time:'Tue 12:22',text:'Adding lightweight counter-tween. Free. 15 min.'},{sender:'me',time:'Tue 12:48',text:'Live. Tested Safari + Chrome mobile.'},
+                {sender:'client',time:'Tue 13:03',text:'Contract closed & $200 released.'},{sender:'system',time:'Tue 13:04',text:'💸 Milestone released · $200.00 → net $180.00'},
+                {sender:'client',time:'Tue 13:04',text:'I\'ll hit you up for the dashboard next month.'}
+            ]},
+            sarah: { name:'Sarah Jenkins', sub:'Canada · PageSpeed optimization', initials:'SJ', color:'rose', messages:[
+                {sender:'client',time:'Mon 08:11',text:'Hi Ahmed — sorry to bother on a Monday 😅'},{sender:'client',time:'Mon 08:11',text:'Site scores 42/100 on PageSpeed. Need 80+.'},
+                {sender:'client',time:'Mon 08:12',type:'image',text:'[Screenshot: PageSpeed 42/100]'},{sender:'me',time:'Mon 08:24',text:'Hi Sarah — very fixable.'},
+                {sender:'me',time:'Mon 08:30',text:'$155 flat. WebP, JS deferral, critical CSS, lazy-load. Re-test before delivery.'},{sender:'client',time:'Mon 08:33',text:'Approved!'},
+                {sender:'system',time:'Mon 08:34',text:'💰 Escrow funded · $155.00'},{sender:'me',time:'Mon 13:14',text:'Images → WebP + srcset. Saved ~1.2MB.'},
+                {sender:'me',time:'Mon 16:48',text:'Done. Mobile 96/100. Desktop 99/100.'},{sender:'client',time:'Mon 16:52',text:'No way! Better than expected!'},
+                {sender:'client',time:'Mon 16:55',text:'Releasing now. Told my co-founder about you 😊'},{sender:'system',time:'Mon 16:56',text:'💸 Milestone released · $155.00 → net $139.50'}
+            ]},
+            claire: { name:'Claire Moreau', sub:'France · CSS grid fix', initials:'CM', color:'amber', messages:[
+                {sender:'client',time:'Sat 10:02',text:'Bonjour Ahmed! Small task if you have time.'},{sender:'client',time:'Sat 10:03',text:'3-column grid misaligns on tablet. 4px shift.'},
+                {sender:'me',time:'Sat 10:15',text:'Bonjour Claire! Classic grid gap bug. $100.'},{sender:'system',time:'Sat 10:18',text:'💰 Escrow funded · $100.00'},
+                {sender:'me',time:'Sat 12:30',text:'Fixed. align-items: stretch was the culprit.'},{sender:'client',time:'Sat 12:45',text:'Works perfectly. Merci beaucoup!'},
+                {sender:'system',time:'Sat 12:46',text:'💸 Order #3391 closed · $100.00 → net $85.00'}
+            ]},
+            david: { name:'David Ross', sub:'USA · Form validation', initials:'DR', color:'slate', messages:[
+                {sender:'client',time:'Fri 15:10',text:'Hey Ahmed, quick one.'},{sender:'client',time:'Fri 15:11',text:'Contact form on Edge submits blank.'},
+                {sender:'me',time:'Fri 15:15',text:'Validation issue. $70. Tested on all browsers.'},{sender:'client',time:'Fri 15:16',text:'Deal.'},
+                {sender:'system',time:'Fri 15:17',text:'💰 Escrow funded · $70.00'},{sender:'me',time:'Fri 17:44',text:'Fixed. Added HTML5 required + pattern fallback.'},
+                {sender:'client',time:'Fri 18:02',text:'Tested. All good.'},{sender:'system',time:'Fri 18:03',text:'💸 Milestone released · $70.00 → net $59.50'}
+            ]},
+            sofia: { name:'Sofia Rossi', sub:'Italy · WordPress menu', initials:'SR', color:'emerald', messages:[
+                {sender:'client',time:'Thu 09:44',text:'Ciao Ahmed! 👋'},{sender:'client',time:'Thu 09:44',text:'Broken menu on mobile WordPress site.'},
+                {sender:'me',time:'Thu 09:52',text:'Ciao Sofia! $60 flat. Done in 1 hour.'},{sender:'system',time:'Thu 09:54',text:'💰 Escrow funded · $60.00'},
+                {sender:'me',time:'Thu 11:05',text:'Fixed. Conflicting plugin — disabled jQuery Migrate.'},{sender:'client',time:'Thu 11:10',text:'Grazie mille! Works perfectly.'},
+                {sender:'system',time:'Thu 11:11',text:'💸 Milestone released · $60.00 → net $51.00'}
+            ]},
+            carlos: { name:'Carlos Mendes', sub:'Brazil · Bilingual fintech landing', initials:'CM', color:'yellow', messages:[
+                {sender:'client',time:'Mon 13:14',text:'Oi Ahmed, tudo bem?'},{sender:'client',time:'Mon 13:15',text:'Need bilingual landing page. English + Portuguese.'},
+                {sender:'me',time:'Mon 13:28',text:'Olá Carlos! $180 for bilingual. 3 days.'},{sender:'system',time:'Mon 13:31',text:'💰 Escrow funded · $180.00'},
+                {sender:'me',time:'Wed 15:00',type:'link',text:'staging.carlosfintech.com.br — first draft'},{sender:'client',time:'Wed 15:22',text:'Muito bom! Small tweaks coming.'},
+                {sender:'me',time:'Thu 11:00',text:'Tweaks applied. Portuguese version done too.'},{sender:'system',time:'Thu 11:05',text:'💸 Milestone released · $180.00 → net $153.00'}
+            ]},
+            raj: { name:'Raj Patel', sub:'India · Batch speed fixes (3 sites)', initials:'RP', color:'orange', messages:[
+                {sender:'client',time:'Oct 20',text:'Hi Ahmed, need 3 more speed fixes this month.'},{sender:'me',time:'Oct 20',text:'Sure Raj. $65 each — $195 for the batch.'},
+                {sender:'system',time:'Oct 20',text:'💰 Escrow funded · $195.00'},{sender:'me',time:'Oct 24',text:'All 3 complete. Scores: 91, 94, 88.'},
+                {sender:'client',time:'Oct 24',text:'Awesome as always. You\'re my go-to now.'},{sender:'system',time:'Oct 24',text:'💸 Milestone released · $195.00 → net $165.75'}
+            ]},
+            fatima: { name:'Fatima Al-Rashid', sub:'UAE · RTL layout audit', initials:'FA', color:'teal', messages:[
+                {sender:'client',time:'Oct 18',text:'Hello Ahmed. Need RTL layout consultation.'},{sender:'me',time:'Oct 18',text:'Hi Fatima. 2-hour audit + fix list. $120.'},
+                {sender:'system',time:'Oct 19',text:'💰 Escrow funded · $120.00'},{sender:'me',time:'Oct 20',text:'Audit complete. 12 issues found, prioritized. Video walkthrough sent.'},
+                {sender:'client',time:'Oct 20',text:'Very thorough. Shukran!'},{sender:'system',time:'Oct 20',text:'💸 Milestone released · $120.00 → net $102.00'}
+            ]},
+            anna: { name:'Anna Schmidt', sub:'Germany · Hero redesign', initials:'AS', color:'red', messages:[
+                {sender:'client',time:'Oct 15',text:'Guten Tag. Need hero redesign.'},{sender:'me',time:'Oct 15',text:'$140 for full redesign + responsive.'},
+                {sender:'system',time:'Oct 15',text:'💰 Escrow funded · $140.00'},{sender:'me',time:'Oct 16',type:'link',text:'anna-hero-demo.netlify.app'},
+                {sender:'client',time:'Oct 16',text:'Two adjustments: font weight and CTA color.'},{sender:'me',time:'Oct 16',text:'Done. Pushed.'},
+                {sender:'system',time:'Oct 16',text:'💸 Milestone released · $140.00 → net $119.00'}
+            ]},
+            marco: { name:'Marco Bianchi', sub:'Italy · Quick UI fix', initials:'MB', color:'lime', messages:[
+                {sender:'client',time:'Oct 12',text:'Ciao! Button text overflowing on mobile.'},{sender:'me',time:'Oct 12',text:'On it. $35.'},
+                {sender:'system',time:'Oct 12',text:'💰 Escrow funded · $35.00'},{sender:'me',time:'Oct 12',text:'Fixed. Padding-based button now.'},
+                {sender:'system',time:'Oct 12',text:'💸 Milestone released · $35.00 → net $29.75'}
+            ]},
+            akira: { name:'Akira Sato', sub:'Japan · Mobile menu alignment', initials:'AS', color:'indigo', messages:[
+                {sender:'client',time:'Oct 10',text:'Hello. Mobile menu button not aligned.'},{sender:'me',time:'Oct 10',text:'Hi Akira! $45. Quick fix.'},
+                {sender:'system',time:'Oct 10',text:'💰 Escrow funded · $45.00'},{sender:'me',time:'Oct 10',text:'Done. iOS + Android both verified.'},
+                {sender:'system',time:'Oct 10',text:'💸 Milestone released · $45.00 → net $38.25'}
+            ]},
+            isabella: { name:'Isabella Costa', sub:'Portugal · Coffee shop landing', initials:'IC', color:'fuchsia', messages:[
+                {sender:'client',time:'Oct 08',text:'Olá! Full redesign for our coffee shop.'},{sender:'me',time:'Oct 08',text:'$130 for modern menu-style landing. 2 days.'},
+                {sender:'system',time:'Oct 08',text:'💰 Escrow funded · $130.00'},{sender:'me',time:'Oct 10',text:'First draft ready. Sending link.'},
+                {sender:'client',time:'Oct 10',text:'Linda! Bela trabalho.'},{sender:'system',time:'Oct 10',text:'💸 Milestone released · $130.00 → net $110.50'}
+            ]},
+            henrik: { name:'Henrik Larsen', sub:'Denmark · Legacy browser fix', initials:'HL', color:'cyan', messages:[
+                {sender:'client',time:'Oct 05',text:'Our site broken on IE11.'},{sender:'me',time:'Oct 05',text:'Hi Henrik — IE11 EOL since 2022. Recommend upgrade banner. $30.'},
+                {sender:'system',time:'Oct 05',text:'💰 Escrow funded · $30.00'},{sender:'me',time:'Oct 05',text:'Done. Friendly upgrade banner.'},
+                {sender:'system',time:'Oct 05',text:'💸 Milestone released · $30.00 → net $25.50'}
+            ]},
+            olivia: { name:'Olivia Brown', sub:'Australia · Booking form', initials:'OB', color:'pink', messages:[
+                {sender:'client',time:'Oct 01',text:'G\'day Ahmed! Need booking form.'},{sender:'me',time:'Oct 01',text:'$110 with validation + calendar. 2 days.'},
+                {sender:'system',time:'Oct 01',text:'💰 Escrow funded · $110.00'},{sender:'me',time:'Oct 03',text:'Booking form live with email confirmations.'},
+                {sender:'system',time:'Oct 03',text:'💸 Milestone released · $110.00 → net $93.50'}
+            ]},
+            pablo: { name:'Pablo Lopez', sub:'Spain · iOS checkout bug', initials:'PL', color:'red', messages:[
+                {sender:'client',time:'Sep 28',text:'Bug in checkout on iOS. Autocomplete overlaps fields.'},{sender:'me',time:'Sep 28',text:'Hi Pablo. z-index issue. $55.'},
+                {sender:'system',time:'Sep 28',text:'💰 Escrow funded · $55.00'},{sender:'me',time:'Sep 28',text:'Fixed. Tested on iOS 15, 16, 17.'},
+                {sender:'system',time:'Sep 28',text:'💸 Milestone released · $55.00 → net $46.75'}
+            ]},
+            nina: { name:'Nina Petrov', sub:'Netherlands · Firefox validation', initials:'NP', color:'orange', messages:[
+                {sender:'client',time:'Sep 22',text:'Hi Ahmed! From Amsterdam. Contact form broken on Firefox.'},{sender:'me',time:'Sep 22',text:'Easy fix. $65.'},
+                {sender:'system',time:'Sep 22',text:'💰 Escrow funded · $65.00'},{sender:'me',time:'Sep 22',text:'Fixed. Tested Firefox desktop + mobile.'},
+                {sender:'system',time:'Sep 22',text:'💸 Milestone released · $65.00 → net $55.25'}
+            ]},
+            hans: { name:'Hans Meyer', sub:'Germany · Full store re-code', initials:'HM', color:'yellow', messages:[
+                {sender:'client',time:'Sep 18',text:'Guten Tag Ahmed.'},{sender:'client',time:'Sep 18',text:'Full store re-code with animated sticky navbar + configurator.'},
+                {sender:'me',time:'Sep 18',text:'15-20 hours work. Quote: $220 minimum.'},{sender:'client',time:'Sep 18',text:'Internal budget was $150. Can you match?'},
+                {sender:'me',time:'Sep 18',text:'Sorry Hans — $220 reflects the custom JS. $200 minimum.'},{sender:'client',time:'Sep 18',text:'Understood. Budget exceeded. We will hold.'}
+            ]},
+            lucas: { name:'Lukas Weber', sub:'Switzerland · Long-term contract', initials:'LW', color:'red', messages:[
+                {sender:'client',time:'Sep 12',text:'Are you available for a 3-month full-time contract?'},{sender:'me',time:'Sep 12',text:'Hello Lukas. On this platform I only take fixed-scope micro projects. Not full-time.'},
+                {sender:'client',time:'Sep 12',text:'Understood. We found an internal dev.'},{sender:'system',time:'Sep 12',text:'🚫 Project cancelled by client'}
+            ]},
+            julien: { name:'Julien Dubois', sub:'Belgium · UI refresh inquiry', initials:'JD', color:'gray', messages:[
+                {sender:'client',time:'Sep 05',text:'Hello? Are you available for a quick CSS fix?'},{sender:'client',time:'Sep 05',text:'Small task — maybe 30 min. Budget $40.'}
+            ]},
+            ravi: { name:'Ravi Kumar', sub:'India · Full e-commerce request', initials:'RK', color:'orange', messages:[
+                {sender:'client',time:'Aug 22',text:'Hi. Need full e-commerce site. Payments, admin, 20 products.'},{sender:'client',time:'Aug 22',text:'Budget $15. Can start today.'},
+                {sender:'me',time:'Aug 22',text:'Hi Ravi. For that scope, minimum is $450.'},{sender:'client',time:'Aug 22',text:'That\'s too much. $25 max.'},
+                {sender:'me',time:'Aug 22',text:'Sorry — can\'t deliver quality work at that price. Best of luck.'},{sender:'client',time:'Aug 22',text:'OK bye.'}
+            ]},
+            tom: { name:'Tom Anderson', sub:'USA · Landing page inquiry', initials:'TA', color:'slate', messages:[
+                {sender:'client',time:'Jul 14',text:'Hey, need a landing page.'},{sender:'client',time:'Jul 14',text:'What\'s your rate?'},
+                {sender:'me',time:'Jul 14',text:'Hi Tom — depends on scope. Small landing $120+, larger $250-400. Happy to discuss details.'}
+            ]},
+            chiara: { name:'Chiara Ferretti', sub:'Italy · Footer CSS fix', initials:'CF', color:'rose', messages:[
+                {sender:'client',time:'May 08',text:'Ciao, can you fix our footer CSS?'},{sender:'client',time:'May 08',text:'What\'s the cost?'},
+                {sender:'me',time:'May 08',text:'Ciao Chiara! Footer fixes typically run $40-60 depending on complexity. Want to share the URL?'}
+            ]},
+            keiko: { name:'Keiko Yamamoto', sub:'Japan · Carousel fix', initials:'KY', color:'pink', messages:[
+                {sender:'client',time:'Feb 20',text:'Hello Ahmed-san. Carousel on Shopify broken.'},{sender:'me',time:'Feb 20',text:'Hi Keiko! $95 flat.'},
+                {sender:'system',time:'Feb 20',text:'💰 Escrow funded · $95.00'},{sender:'me',time:'Feb 21',text:'Fixed. Swipe gestures now work.'},
+                {sender:'system',time:'Feb 21',text:'💸 Milestone released · $95.00 → net $85.50'}
+            ]},
+            thomas: { name:'Thomas Müller', sub:'Germany · Header animation', initials:'TM', color:'cyan', messages:[
+                {sender:'client',time:'Jan 12',text:'Need smooth header animation on scroll.'},{sender:'me',time:'Jan 12',text:'$130 for custom smooth-scroll header + test.'},
+                {sender:'system',time:'Jan 12',text:'💰 Escrow funded · $130.00'},{sender:'me',time:'Jan 13',text:'Live. 60fps verified.'},
+                {sender:'system',time:'Jan 13',text:'💸 Milestone released · $130.00 → net $117.00'}
+            ]},
+            marie: { name:'Marie Dubois', sub:'France · Cart badge CSS', initials:'MD', color:'violet', messages:[
+                {sender:'client',time:'Nov 15',text:'Bonjour! Cart badge misaligned.'},{sender:'me',time:'Nov 15',text:'$90 flat.'},
+                {sender:'system',time:'Nov 15',text:'💰 Escrow funded · $90.00'},{sender:'me',time:'Nov 16',text:'Fixed.'},
+                {sender:'system',time:'Nov 16',text:'💸 Milestone released · $90.00 → net $81.00'},{sender:'client',time:'Nov 16',text:'Merci Ahmed! À bientôt.'}
+            ]},
+            pedro: { name:'Pedro Silva', sub:'Mexico · Spam filter', initials:'PS', color:'emerald', messages:[
+                {sender:'client',time:'Sep 10',text:'Hola! Form spam filter needed.'},{sender:'me',time:'Sep 10',text:'$80 flat.'},
+                {sender:'system',time:'Sep 10',text:'💰 Escrow funded · $80.00'},{sender:'me',time:'Sep 11',text:'Added honeypot + basic rate-limiting.'},
+                {sender:'system',time:'Sep 11',text:'💸 Milestone released · $80.00 → net $72.00'}
+            ]},
+            aisha: { name:'Aisha Ibrahim', sub:'Egypt · RTL audit (small)', initials:'AI', color:'amber', messages:[
+                {sender:'client',time:'Jul 05',text:'Hello. Small RTL audit needed.'},{sender:'me',time:'Jul 05',text:'Hi Aisha! $75 for a quick audit + fix list.'},
+                {sender:'system',time:'Jul 05',text:'💰 Escrow funded · $75.00'},{sender:'me',time:'Jul 06',text:'Audit complete. 6 issues found.'},
+                {sender:'system',time:'Jul 06',text:'💸 Milestone released · $75.00 → net $67.50'}
+            ]},
+            oliver: { name:'Oliver Kelly', sub:'Ireland · Booking widget', initials:'OK', color:'lime', messages:[
+                {sender:'client',time:'May 20',text:'Booking widget broken on mobile.'},{sender:'me',time:'May 20',text:'Hi Oliver! $110.'},
+                {sender:'system',time:'May 20',text:'💰 Escrow funded · $110.00'},{sender:'me',time:'May 21',text:'Fixed and mobile-optimized.'},
+                {sender:'system',time:'May 21',text:'💸 Milestone released · $110.00 → net $99.00'}
+            ]},
+            yuna: { name:'Yuna Park', sub:'South Korea · Menu dropdown', initials:'YP', color:'fuchsia', messages:[
+                {sender:'client',time:'Mar 15',text:'Menu dropdown bug — iOS only.'},{sender:'me',time:'Mar 15',text:'$85 flat.'},
+                {sender:'system',time:'Mar 15',text:'💰 Escrow funded · $85.00'},{sender:'me',time:'Mar 16',text:'Fixed.'},
+                {sender:'system',time:'Mar 16',text:'💸 Milestone released · $85.00 → net $76.50'},{sender:'client',time:'Mar 16',text:'Thank you!'}
+            ]},
+            khalid: { name:'Khalid Benali', sub:'Morocco · First client!', initials:'KB', color:'brand', messages:[
+                {sender:'client',time:'Dec 02, 2024',text:'سلام أحمد. Small fix needed on my HTML site.'},{sender:'client',time:'Dec 02, 2024',text:'Menu doesn\'t work. Budget is tight.'},
+                {sender:'me',time:'Dec 02, 2024',text:'وعليكم السلام خالد! For a simple menu fix, $40.'},{sender:'client',time:'Dec 02, 2024',text:'Deal! أول تجربة مع فريلانسر مغربي 👍'},
+                {sender:'system',time:'Dec 02, 2024',text:'💰 Escrow funded · $40.00'},{sender:'me',time:'Dec 03, 2024',text:'Fixed and tested. Sent updates.'},
+                {sender:'system',time:'Dec 03, 2024',text:'💸 Milestone released · $40.00 → net $36.00'},{sender:'client',time:'Dec 03, 2024',text:'أول زبون! Fix worked perfectly. 🙏'}
+            ]},
+            jake: { name:'Jake Thompson', sub:'USA · First US client', initials:'JT', color:'blue', messages:[
+                {sender:'client',time:'Sep 18, 2024',text:'Hey, saw your profile. Need a landing page for my SaaS.'},{sender:'me',time:'Sep 18, 2024',text:'Hi Jake! Small landing page — $120.'},
+                {sender:'system',time:'Sep 18, 2024',text:'💰 Escrow funded · $120.00'},{sender:'me',time:'Sep 20, 2024',type:'link',text:'jake-saas.netlify.app — preview'},
+                {sender:'client',time:'Sep 20, 2024',text:'This is great! Deploying now.'},{sender:'system',time:'Sep 20, 2024',text:'💸 Milestone released · $120.00 → net $108.00'}
+            ]},
+            minji: { name:'Min-ji Park', sub:'South Korea · Blog layout', initials:'MP', color:'indigo', messages:[
+                {sender:'client',time:'Jun 22, 2024',text:'Blog category layout broken.'},{sender:'me',time:'Jun 22, 2024',text:'$50 flat.'},
+                {sender:'system',time:'Jun 22, 2024',text:'💰 Escrow funded · $50.00'},{sender:'me',time:'Jun 22, 2024',text:'Fixed. Sent updated CSS.'},
+                {sender:'system',time:'Jun 22, 2024',text:'💸 Milestone released · $50.00 → net $45.00'},{sender:'client',time:'Jun 22, 2024',text:'Blog layout fixed. 감사합니다!'}
+            ]},
+            mohammed: { name:'Mohammed Ali', sub:'Egypt · Full site request', initials:'MA', color:'teal', messages:[
+                {sender:'client',time:'Mar 08, 2024',text:'Need full website. How much?'},{sender:'me',time:'Mar 08, 2024',text:'Hi Mohammed. Depends on scope — small site starts at $150.'},
+                {sender:'client',time:'Mar 08, 2024',text:'$10?'},{sender:'me',time:'Mar 08, 2024',text:'Sorry, that\'s not feasible for any real project. Best of luck.'},
+                {sender:'client',time:'Mar 08, 2024',text:'Too expensive.'}
+            ]}
+        };
+
+        let currentActiveKey = null;
+
+        function openChat(key) {
+            currentActiveKey = key;
+            const chat = chatStore[key];
+            if (!chat) return;
+
+            document.getElementById('chat-title-name').textContent = chat.name;
+            document.getElementById('chat-title-sub').textContent = chat.sub;
+            const av = document.getElementById('chat-avatar');
+            av.textContent = chat.initials;
+            av.className = `w-9 h-9 rounded-full bg-gradient-to-br ${colorMap[chat.color]} border flex items-center justify-center text-[11px] font-bold`;
+
+            const client = clients.find(c => c.key === key);
+            const badge = document.getElementById('chat-status-badge');
+            badge.textContent = client.badge;
+            badge.className = `text-[9px] px-2 py-0.5 rounded-full border font-semibold ${badgeMap[client.badgeType]}`;
+
+            const container = document.getElementById('chat-messages-container');
+            container.innerHTML = '';
+            document.getElementById('chat-loading').style.display = 'flex';
+
+            document.body.classList.add('chat-open', 'no-scroll');
+            document.getElementById('active-chat-box').classList.add('open');
+
+            setTimeout(() => {
+                document.getElementById('chat-loading').style.display = 'none';
+                renderChatMessages(chat);
+            }, 500);
+        }
+
+        function renderChatMessages(chat) {
+            const container = document.getElementById('chat-messages-container');
+            container.innerHTML = '';
+            let lastTime = null;
+
+            chat.messages.forEach((m, idx) => {
+                if (m.time && m.sender !== 'system') {
+                    const dayPrefix = m.time.split(' ')[0];
+                    const lastDay = lastTime ? lastTime.split(' ')[0] : null;
+                    if (!lastTime || (dayPrefix !== lastDay && /Mon|Tue|Wed|Thu|Fri|Sat|Sun|Oct|Sep|Aug|Jul|Jun|May|Apr|Mar|Feb|Jan|Dec|Nov/.test(dayPrefix))) {
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-center my-2 msg-row';
+                        div.innerHTML = `<span class="text-[9px] text-zinc-600 bg-ink-1/60 px-2.5 py-1 rounded-full border border-line/50">${escapeHtml(dayPrefix)}</span>`;
+                        container.appendChild(div);
+                        setTimeout(() => div.classList.add('shown'), idx * 25);
+                    }
+                }
+                lastTime = m.time;
+
+                if (m.sender === 'system') {
+                    const sys = document.createElement('div');
+                    sys.className = 'flex justify-center my-1.5 msg-row';
+                    sys.innerHTML = `<span class="text-[9px] bg-brand-950/60 text-brand-400 px-2.5 py-1 rounded-full border border-brand-800/60 font-medium">${escapeHtml(m.text)}</span>`;
+                    container.appendChild(sys);
+                    setTimeout(() => sys.classList.add('shown'), idx * 25);
+                    return;
+                }
+
+                const isMe = m.sender === 'me';
+                const row = document.createElement('div');
+                row.className = (isMe ? 'flex justify-end msg-row' : 'flex justify-start msg-row') + ' mt-1.5';
+
+                const bubble = document.createElement('div');
+                bubble.className = (isMe ? 'bubble-me text-white' : 'bubble-client text-zinc-200') + ` px-3 py-2 rounded-2xl ${isMe ? 'rounded-tr-sm' : 'rounded-tl-sm'} max-w-[85%] text-[12px] leading-relaxed`;
+
+                let inner = '';
+                if (m.type === 'image') {
+                    inner += `<div class="w-52 h-32 rounded-lg bg-ink-0/60 border border-white/10 mb-1.5 flex flex-col items-center justify-center gap-1">
+                        <i class="bi bi-image text-white/40 text-2xl"></i>
+                        <span class="text-[9px] text-white/40 px-2 text-center">${escapeHtml(m.text.replace(/\[|\]/g, ''))}</span>
+                    </div>`;
+                } else if (m.type === 'link') {
+                    inner += `<div class="flex items-center gap-1.5 mb-1 text-[10px] text-brand-200"><i class="bi bi-link-45deg"></i><span class="font-mono">Link</span></div><div class="underline break-all">${escapeHtml(m.text)}</div>`;
+                } else {
+                    inner += `<div>${escapeHtml(m.text)}</div>`;
+                }
+
+                inner += `<div class="text-[9px] mt-1 ${isMe ? 'text-white/60 text-right flex items-center justify-end gap-1' : 'text-zinc-500'}">${escapeHtml(m.time || '')}${isMe ? ' <i class="bi bi-check2-all"></i>' : ''}</div>`;
+
+                bubble.innerHTML = inner;
+                row.appendChild(bubble);
+                container.appendChild(row);
+                setTimeout(() => row.classList.add('shown'), idx * 25);
+            });
+
+            setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+        }
+
+        function closeChat() {
+            const box = document.getElementById('active-chat-box');
+            box.classList.remove('open');
+            document.body.classList.remove('chat-open', 'no-scroll');
+            setTimeout(() => { currentActiveKey = null; }, 320);
+        }
+
+        function sendUserMessage() {
+            const input = document.getElementById('chat-input-field');
+            const txt = input.value.trim();
+            if (!txt || !currentActiveKey) return;
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            chatStore[currentActiveKey].messages.push({ sender:'me', text:txt, time });
+            input.value = '';
+            const container = document.getElementById('chat-messages-container');
+            const row = document.createElement('div');
+            row.className = 'flex justify-end msg-row mt-1.5';
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble-me text-white px-3 py-2 rounded-2xl rounded-tr-sm max-w-[85%] text-[12px] leading-relaxed';
+            bubble.innerHTML = `<div>${escapeHtml(txt)}</div><div class="text-[9px] mt-1 text-white/60 text-right flex items-center justify-end gap-1">${time} <i class="bi bi-check2-all"></i></div>`;
+            row.appendChild(bubble);
+            container.appendChild(row);
+            setTimeout(() => row.classList.add('shown'), 20);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleEnterMessage(e) { if (e.key === 'Enter') { e.preventDefault(); sendUserMessage(); } }
+
+        function changeLanguage(lang) {
+            if (lang === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
+                document.documentElement.setAttribute('lang', 'ar');
+                toast('تم تفعيل اللغة العربية');
+            } else {
+                document.documentElement.setAttribute('dir', 'ltr');
+                document.documentElement.setAttribute('lang', lang);
+                toast('Language set to ' + lang.toUpperCase());
+            }
+        }
+
+        function toggleDemo(type) {
+            const pSite = document.getElementById('demo-site-perfume');
+            const tSite = document.getElementById('demo-site-tech');
+            const url = document.getElementById('demo-url');
+            const bP = document.getElementById('btn-demo-perfume');
+            const bT = document.getElementById('btn-demo-tech');
+            if (type === 'perfume') {
+                pSite.classList.remove('hidden'); tSite.classList.add('hidden');
+                url.textContent = 'maison-nuit.fr';
+                bP.className = 'px-2.5 py-1 text-[10px] font-bold rounded-md bg-ink-3 text-brand-400';
+                bT.className = 'px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-500';
+            } else {
+                tSite.classList.remove('hidden'); pSite.classList.add('hidden');
+                url.textContent = 'vance-advisory.io';
+                bT.className = 'px-2.5 py-1 text-[10px] font-bold rounded-md bg-ink-3 text-brand-400';
+                bP.className = 'px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-500';
+            }
+        }
+
+        function switchTab(tab) {
+            startProgress();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-brand-400'); btn.classList.add('text-zinc-500'); });
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + tab);
+            if (activeNav) { activeNav.classList.add('text-brand-400'); activeNav.classList.remove('text-zinc-500'); }
+            if (tab === 'overview') setTimeout(renderChart, 80);
+            if (tab === 'messages') setTimeout(renderClientList, 100);
+            setTimeout(completeProgress, 350);
+        }
+
+        const regions = [
+            { flag:'🇫🇷', name:'France', detail:'12 gigs · avg $120.83', amount:'$1,450', pct:92 },
+            { flag:'🇺🇸', name:'United States', detail:'10 gigs · avg $118.00', amount:'$1,180', pct:75 },
+            { flag:'🇨🇦', name:'Canada', detail:'5 gigs · avg $104.00', amount:'$520', pct:33 },
+            { flag:'🇩🇪', name:'Germany', detail:'5 gigs · avg $84.00', amount:'$420', pct:27 },
+            { flag:'🇬🇧', name:'United Kingdom', detail:'3 gigs · avg $96.67', amount:'$290', pct:18 },
+            { flag:'🇯🇵', name:'Japan', detail:'3 gigs · avg $80.00', amount:'$240', pct:15 }
+        ];
+        function renderRegions() {
+            document.getElementById('regions-list').innerHTML = regions.map(r => `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-lg">${r.flag}</span>
+                        <div><div class="text-[12px] text-zinc-100 font-semibold">${r.name}</div><div class="text-[10px] text-zinc-500">${r.detail}</div></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[12px] font-bold text-zinc-100">${r.amount}</div>
+                        <div class="w-16 h-1 bg-ink-3 rounded-full mt-1 overflow-hidden"><div class="h-full bg-brand-500 rounded-full" style="width: ${r.pct}%"></div></div>
+                    </div>
+                </div>
+            `).join('') + `<div class="text-center text-[10px] text-zinc-500 pt-2 border-t border-line/50">+ 10 more countries: 🇧🇷 🇮🇳 🇦🇪 🇮🇹 🇵🇹 🇩🇰 🇦🇺 🇪🇸 🇳🇱 🇲🇦 🇰🇷 🇪🇬 🇲🇽 🇮🇪</div>`;
+        }
+
+        function renderChart() {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
+            const w = rect.width, h = rect.height;
+            // 22 months: Dec 2024 → Oct 2026 (smooth upward with plateaus)
+            const data = [0.03,0.06,0.10,0.15,0.21,0.28,0.35,0.42,0.50,0.57,0.64,0.71,0.76,0.81,0.85,0.88,0.91,0.93,0.95,0.97,0.985,1.0];
+            const pad = 8, chartH = h - pad * 2;
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = '#1a1a1e'; ctx.lineWidth = 1;
+            for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.moveTo(0, (h/4)*i); ctx.lineTo(w, (h/4)*i); ctx.stroke(); }
+            const points = data.map((v,i) => ({ x:(i/(data.length-1))*w, y: pad + chartH*(1-v) }));
+            const grad = ctx.createLinearGradient(0,0,0,h);
+            grad.addColorStop(0,'rgba(16,185,129,0.28)'); grad.addColorStop(1,'rgba(5,5,6,0)');
+            ctx.beginPath(); ctx.moveTo(points[0].x,points[0].y);
+            points.forEach(p => ctx.lineTo(p.x,p.y));
+            ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(points[0].x,points[0].y);
+            points.forEach(p => ctx.lineTo(p.x,p.y));
+            ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+            const last = points[points.length-1];
+            ctx.beginPath(); ctx.arc(last.x-2,last.y,4,0,Math.PI*2); ctx.fillStyle = '#10b981'; ctx.fill();
+            ctx.beginPath(); ctx.arc(last.x-2,last.y,8,0,Math.PI*2); ctx.fillStyle = 'rgba(16,185,129,0.25)'; ctx.fill();
+        }
+
+        let resizeTimer;
+        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderChart, 150); });
+
+        window.addEventListener('load', () => {
+        // Handle PWA shortcuts (?tab=messages)
+const urlParams = new URLSearchParams(location.search);
+const startTab = urlParams.get('tab');
+if (startTab && document.getElementById('view-' + startTab)) {
+    switchTab(startTab);
+}
+
+            renderRegions();
+            renderClientList();
+            setTimeout(renderChart, 200);
+            setTimeout(() => {
+                const loader = document.getElementById('initial-loader');
+                loader.style.transition = 'opacity 0.4s';
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 400);
+            }, 1200);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Invisible ⚡</title>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;height:100vh;font-family:sans-serif}
+  #vid{display:none}
+  #output{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  #flash{position:fixed;inset:0;pointer-events:none;z-index:8;opacity:0;
+         background:radial-gradient(circle,#fff,#00e5ff 40%,transparent 70%);
+         transition:opacity .2s}
+  #hud{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;
+       color:#0ff;background:rgba(0,0,0,.75);padding:12px 24px;border-radius:30px;
+       border:1px solid #0ff;font-size:16px;text-align:center;max-width:90vw}
+  #btn{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;
+       padding:20px 40px;font-size:20px;font-weight:bold;border:none;border-radius:60px;
+       background:linear-gradient(135deg,#00e5ff,#0066ff);color:#fff;cursor:pointer;
+       box-shadow:0 0 40px #00e5ff}
+  #status{position:fixed;top:15px;right:15px;z-index:10;color:#0ff;
+          background:rgba(0,0,0,.75);padding:8px 16px;border-radius:20px;font-size:13px;
+          max-width:300px;word-break:break-word}
+  #err{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:30;
+       background:#1a0011;border:2px solid #ff3355;color:#fff;padding:24px;border-radius:16px;
+       max-width:500px;width:92vw;display:none;line-height:1.6}
+  #err h3{color:#ff6688;margin-bottom:12px}
+  #err code{background:#000;padding:2px 6px;border-radius:4px;color:#0ff;font-size:12px}
+  #err .hint{margin-top:14px;padding-top:12px;border-top:1px solid #ff335533;font-size:14px;color:#ffb}
+</style>
+</head>
+<body>
+
+<button id="btn">⚡ تشغيل الكاميرا ⚡</button>
+<div id="hud">اضغط الزر للبدء</div>
+<div id="status">جاهز</div>
+
+<div id="err">
+  <h3>❌ خطأ في الكاميرا</h3>
+  <div id="errMsg"></div>
+  <div class="hint" id="errHint"></div>
+</div>
+
+<video id="vid" autoplay playsinline muted></video>
+<canvas id="output"></canvas>
+<div id="flash"></div>
+
+<script>
+const vid = document.getElementById('vid');
+const out = document.getElementById('output');
+const octx = out.getContext('2d');
+const flash = document.getElementById('flash');
+const hud = document.getElementById('hud');
+const statusEl = document.getElementById('status');
+
+let handOnHead = false;
+let isVisible = true;
+let cooldown = false;
+let bodyMask = null;
+let particleList = [];
+let handLandmarks = [];
+
+// ============ فحص البيئة أولاً ============
+function checkEnvironment() {
+  // فحص file://
+  if (location.protocol === 'file:') {
+    return {
+      ok: false,
+      msg: 'أنت تفتح الملف مباشرة (<code>file://</code>).<br>متصفحات Firefox و Safari تمنع الكاميرا من الملفات المحلية.',
+      hint: '✅ الحل:<br>افتح Terminal / CMD في مجلد الملف واكتب:<br><code>python -m http.server 8000</code><br>ثم افتح <code>http://localhost:8000</code>'
+    };
+  }
+  if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    return {
+      ok: false,
+      msg: 'الصفحة غير آمنة (<code>http://</code> وليس على localhost).',
+      hint: '✅ الحل: استخدم <code>https://</code> أو شغّل سيرفر على <code>localhost</code>'
+    };
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return {
+      ok: false,
+      msg: 'متصفحك لا يدعم <code>getUserMedia</code>.',
+      hint: '✅ استخدم إصدار حديث من Chrome / Firefox / Safari / Edge'
+    };
+  }
+  return { ok: true };
+}
+
+function showError(title, hint) {
+  document.getElementById('errMsg').innerHTML = title;
+  document.getElementById('errHint').innerHTML = hint || '';
+  document.getElementById('err').style.display = 'block';
+  document.getElementById('btn').style.display = 'none';
+  statusEl.textContent = 'خطأ';
+}
+
+// ============ فحص الإذن الحالي ============
+async function checkPermission() {
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      const p = await navigator.permissions.query({ name: 'camera' });
+      return p.state; // 'granted' | 'denied' | 'prompt'
+    }
+  } catch(e) {}
+  return 'unknown';
+}
+
+// ============ محاولات متعددة لفتح الكاميرا ============
+async function startCamera() {
+  const attempts = [
+    { video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+    { video: { facingMode: 'user' }, audio: false },
+    { video: true, audio: false }
+  ];
+
+  let lastErr;
+  for (let i = 0; i < attempts.length; i++) {
+    try {
+      statusEl.textContent = `محاولة فتح الكاميرا (${i+1}/${attempts.length})...`;
+      const stream = await navigator.mediaDevices.getUserMedia(attempts[i]);
+      return stream;
+    } catch (e) {
+      lastErr = e;
+      // هذه الأخطاء لا فائدة من إعادة المحاولة
+      if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') throw e;
+      if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') throw e;
+    }
+  }
+  throw lastErr;
+}
+
+// ============ معالجة الخطأ وعرض رسالة مفيدة ============
+function handleCameraError(e) {
+  const name = e.name || 'UnknownError';
+  const messages = {
+    'NotAllowedError': {
+      msg: '🚫 تم رفض الإذن بالكاميرا.',
+      hint: 'اضغط أيقونة 🔒 أو 🎥 بجانب عنوان الصفحة في شريط العنوان،<br>ثم غيّر "الكاميرا" إلى <b>السماح (Allow)</b>، ثم أعد تحميل الصفحة.'
+    },
+    'PermissionDeniedError': {
+      msg: '🚫 تم رفض الإذن بالكاميرا.',
+      hint: 'الإذن مرفوض من إعدادات المتصفح — افتح إعدادات الموقع واسمح بالكاميرا.'
+    },
+    'NotFoundError': {
+      msg: '📷 لم يتم العثور على أي كاميرا.',
+      hint: 'تأكد أن الكاميرا موصولة (USB) أو أن للجهاز كاميرا. جرّب كاميرا أخرى.'
+    },
+    'DevicesNotFoundError': {
+      msg: '📷 لم يتم العثور على أي كاميرا.',
+      hint: 'لا توجد كاميرا متاحة على هذا الجهاز.'
+    },
+    'NotReadableError': {
+      msg: '🔒 الكاميرا مشغولة بتطبيق آخر.',
+      hint: 'أغلق Zoom / Teams / Skype / Meet / أي تطبيق كاميرا،<br>ثم أعد المحاولة. (على Windows قد يحدث أحياناً حتى لو أغلقت التطبيق — أعد تشغيل المتصفح)'
+    },
+    'TrackStartError': {
+      msg: '🔒 الكاميرا مشغولة.',
+      hint: 'أغلق التطبيقات الأخرى التي تستخدم الكاميرا.'
+    },
+    'OverconstrainedError': {
+      msg: '⚙️ إعدادات الكاميرا غير مدعومة.',
+      hint: 'جهازك لا يدعم الإعدادات المطلوبة — تمت تجربة إعدادات بديلة بدون فائدة. حدّث المتصفح.'
+    },
+    'SecurityError': {
+      msg: '🔐 خطأ أمني (غالباً بسبب <code>file://</code>).',
+      hint: 'شغّل سيرفر محلي: <code>python -m http.server 8000</code><br>ثم افتح <code>http://localhost:8000</code>'
+    }
+  };
+  const info = messages[name] || {
+    msg: `خطأ: <code>${name}</code>`,
+    hint: `الرسالة: ${e.message || 'بدون تفاصيل'}`
+  };
+  showError(info.msg, info.hint);
+  console.error('[Camera Error]', name, e);
+}
+
+// ============ بدء التشغيل ============
+document.getElementById('btn').onclick = async () => {
+  const env = checkEnvironment();
+  if (!env.ok) {
+    showError(env.msg, env.hint);
+    return;
+  }
+
+  const perm = await checkPermission();
+  if (perm === 'denied') {
+    showError(
+      '🚫 إذن الكاميرا مرفوض مسبقاً لهذا الموقع.',
+      'اضغط على 🔒 في شريط العنوان → إعدادات الموقع → الكاميرا → <b>السماح</b><br>ثم أعد تحميل الصفحة (F5).'
+    );
+    return;
+  }
+
+  try {
+    const stream = await startCamera();
+    vid.srcObject = stream;
+    await vid.play();
+    
+    // انتظر حتى تصبح أبعاد الفيديو معروفة
+    await new Promise(res => {
+      if (vid.videoWidth) res();
+      else vid.onloadedmetadata = () => res();
+    });
+    
+    out.width = vid.videoWidth;
+    out.height = vid.videoHeight;
+    
+    document.getElementById('btn').style.display = 'none';
+    hud.textContent = 'ضع إصبعك على رأسك للاختفاء ✋';
+    statusEl.textContent = 'جارٍ تحميل النماذج...';
+
+    startHands();
+    startSegmentation();
+    animate();
+    
+  } catch (e) {
+    handleCameraError(e);
+  }
+};
+
+// ============ تتبع اليد ============
+let handsReady = false;
+function startHands(){
+  const hands = new Hands({locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+  hands.setOptions({maxNumHands:2, modelComplexity:0, minDetectionConfidence:0.6, minTrackingConfidence:0.6});
+  hands.onResults(res => {
+    handLandmarks = res.multiHandLandmarks || [];
+    detectHandOnHead();
+    handsReady = true;
+  });
+  
+  // حلقة واحدة مشتركة بدل Camera — لتفادي مشاكل تعدد الفتح
+  const run = async () => {
+    if (vid.readyState >= 2) {
+      try { await hands.send({image: vid}); } catch(e){}
+    }
+    requestAnimationFrame(run);
+  };
+  run();
+}
+
+function detectHandOnHead(){
+  let nowOnHead = false;
+  const headX = 0.5, headY = 0.22;
+  for(const lm of handLandmarks){
+    const palm = lm[9];
+    const tips = [lm[8], lm[12]];
+    const dPalm = Math.hypot(palm.x - headX, palm.y - headY);
+    const anyTip = tips.some(t => Math.hypot(t.x-headX, t.y-headY) < 0.25);
+    if(dPalm < 0.22 || anyTip) nowOnHead = true;
+  }
+  if(nowOnHead && !handOnHead && !cooldown) triggerSwitch();
+  handOnHead = nowOnHead;
+}
+
+// ============ فصل الجسم ============
+function startSegmentation(){
+  const seg = new SelfieSegmentation({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+  });
+  seg.setOptions({modelSelection: 1});
+  seg.onResults(res => {
+    bodyMask = res.segmentationMask;
+    if (handsReady) statusEl.textContent = 'جاهز ✓';
+  });
+  const run = async () => {
+    if (vid.readyState >= 2) {
+      try { await seg.send({image: vid}); } catch(e){}
+    }
+    requestAnimationFrame(run);
+  };
+  run();
+}
+
+// ============ التبديل ============
+function triggerSwitch(){
+  cooldown = true;
+  setTimeout(()=>cooldown = false, 1500);
+  if(isVisible){
+    hud.textContent = '⚡ تختفي... ⚡';
+    explode(window.innerWidth/2, window.innerHeight/2, 150, '#00e5ff');
+    flashScreen('#00e5ff');
+    setTimeout(()=>{
+      isVisible = false;
+      hud.textContent = '👻 مختفي — ضع إصبعك مجدداً للظهور';
+    }, 300);
+  } else {
+    hud.textContent = '⚡ تظهر... ⚡';
+    explode(window.innerWidth/2, window.innerHeight/2, 200, '#00e5ff');
+    flashScreen('#ffffff');
+    setTimeout(()=>{
+      isVisible = true;
+      hud.textContent = 'ضع إصبعك على رأسك للاختفاء ✋';
+    }, 300);
+  }
+}
+
+function flashScreen(color){
+  flash.style.background = `radial-gradient(circle,${color},#00e5ff 40%,transparent 70%)`;
+  flash.style.opacity = '1';
+  setTimeout(()=>flash.style.opacity = '0', 250);
+}
+
+// ============ الحلقة الرئيسية ============
+const maskCanvas = document.createElement('canvas');
+const mctx = maskCanvas.getContext('2d');
+
+function animate(){
+  if(vid.readyState === 4 && bodyMask){
+    const w = out.width, h = out.height;
+    octx.save();
+    octx.clearRect(0, 0, w, h);
+    octx.drawImage(vid, 0, 0, w, h);
+    
+    if(!isVisible){
+      maskCanvas.width = w; maskCanvas.height = h;
+      mctx.clearRect(0, 0, w, h);
+      mctx.drawImage(bodyMask, 0, 0, w, h);
+      octx.globalCompositeOperation = 'destination-out';
+      octx.drawImage(maskCanvas, 0, 0);
+      octx.globalCompositeOperation = 'source-over';
+    }
+    
+    if(handLandmarks.length){
+      octx.strokeStyle = '#00e5ff';
+      octx.lineWidth = 2;
+      octx.shadowBlur = 10;
+      octx.shadowColor = '#00e5ff';
+      const c = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
+      for(const lm of handLandmarks){
+        for(const [a,b] of c){
+          octx.beginPath();
+          octx.moveTo(lm[a].x*w, lm[a].y*h);
+          octx.lineTo(lm[b].x*w, lm[b].y*h);
+          octx.stroke();
+        }
+      }
+      octx.shadowBlur = 0;
+    }
+    octx.restore();
+  }
+  renderParticles();
+  requestAnimationFrame(animate);
+}
+
+// ============ الشرارات ============
+const particleLayer = document.createElement('canvas');
+particleLayer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:5';
+document.body.appendChild(particleLayer);
+const pctx = particleLayer.getContext('2d');
+function resizeLayer(){ particleLayer.width = window.innerWidth; particleLayer.height = window.innerHeight; }
+resizeLayer();
+window.addEventListener('resize', resizeLayer);
+
+function explode(x, y, count, color){
+  for(let i=0; i<count; i++){
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 10;
+    particleList.push({
+      x, y,
+      vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+      life: 1, decay: 0.012 + Math.random()*0.02,
+      size: 2 + Math.random()*5,
+      color: Math.random() > 0.4 ? color : '#ffffff'
+    });
+  }
+}
+
+function renderParticles(){
+  pctx.clearRect(0, 0, particleLayer.width, particleLayer.height);
+  for(let i = particleList.length-1; i >= 0; i--){
+    const p = particleList[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.18; p.vx *= 0.98;
+    p.life -= p.decay; p.size *= 0.985;
+    if(p.life <= 0){ particleList.splice(i,1); continue; }
+    pctx.globalAlpha = p.life;
+    pctx.fillStyle = p.color;
+    pctx.shadowBlur = 15; pctx.shadowColor = p.color;
+    pctx.beginPath();
+    pctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    pctx.fill();
+  }
+  pctx.globalAlpha = 1; pctx.shadowBlur = 0;
+}
+</script>
+</body>
+</html>
